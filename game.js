@@ -1,106 +1,64 @@
+// Initialization
+//--------------------------------------------------------------------------------
+
 var canvas = document.getElementById("gameCanvas");
 var context = canvas.getContext("2d");
 
-const BASE_UNIT_SIZE = 20; // Tetromino block size
+const BASE_UNIT_SIZE = 20; // Tetromino block size, pixels
 const FPS = 30; // Frames per second
-const DEBUG = true; // Enable testing functionality (read: cheats)
+const DEBUG = false; // Enable testing functionality (read: cheats)
+
+
+// Main game loop
+//--------------------------------------------------------------------------------
 
 // Canvas rendering
 window.onload = function() {
     setInterval(function() {
         context.clearRect(0, 0, canvas.width, canvas.height);
-        drawGamePiece(gamePiece.xPosition, gamePiece.yPosition, gamePiece.orientation, gamePiece.type);
+        gamePiece.updateTemplate(); // required because gamePiece.template does not dynamically update with xPosition and yPosition
+        gameEngine();
+        drawGamePiece();
         // reserved for drawing fallen pieces
-        // reserved for checking horizontal boundaries
-        // reserved for collision detection
+        // reserved for drawing game stats
+        
     }, 1000/FPS)
 }
 
-// The playable piece, declared as object literal
+
+// Functionality
+//------------------------------------------------------------------------------
+
+var fallSpeed = 20; // pixels per second
+
+// Game engine
+function gameEngine() {
+    if (gamePiece.yPosition < canvas.height) {
+        gamePiece.yPosition += fallSpeed/(1000/FPS);
+    }
+}
+
+function drawGamePiece() {
+    for (let i = 0; i < gamePiece.template.length; i++) {
+        context.fillRect(gamePiece.template[i][0], gamePiece.template[i][1], gamePiece.template[i][2], gamePiece.template[i][3]);
+    }
+}
+
+// The playable piece, declared as object literal with placeholder attributes
 var gamePiece = {
     xPosition : 200,
     yPosition : 200,
     orientation : 1,
-    type : "T"
+    type : "I",
+    leftBoundary : 0,
+    rightBoundary : 0,
+    updateTemplate : function() {selectGamePiece(gamePiece.orientation, gamePiece.type)},
+    template : [[], ,[] ,[], []]
 };
-
-// Keyboard event listeners and friends
-document.addEventListener('keydown', keyDownHandler, false);
-
-function keyDownHandler(event) {
-    if (event.keyCode == 39) {
-        // Right arrow
-        moveGamePiece("RIGHT");
-    }
-    else if (event.keyCode == 37) {
-        // Left arrow
-        moveGamePiece("LEFT");
-    }
-    else if (event.keyCode == 40) {
-        // Down arrow
-    }
-    else if (event.keyCode == 38) {
-        // Up arrow
-        rotateGamePiece("CLOCKWISE");
-    }
-    else if (event.keyCode == 32) {
-        // Spacebar
-    }
-    else if (event.keyCode == 81) {
-        // Q key
-        rotateGamePiece("COUNTERCLOCKWISE");
-    }
-    else if (event.keyCode == 87) {
-        // W key
-        rotateGamePiece("CLOCKWISE");
-    }
-    else { // Other key press
-        console.log("Unmapped key press detected " + event.keycode);
-    }
-    if (DEBUG == true) {
-        if (event.keyCode == 73) {
-            gamePiece.type = "I";
-        }
-        else if (event.keyCode == 79) {
-            gamePiece.type = "O";
-        }
-        else if (event.keyCode == 84) {
-            gamePiece.type = "T";
-        }
-        else if (event.keyCode == 83) {
-            gamePiece.type = "S";
-        }
-        else if (event.keyCode == 90) {
-            gamePiece.type = "Z";
-        }
-        else if (event.keyCode == 74) {
-            gamePiece.type = "J";
-        }
-        else if (event.keyCode == 76) {
-            gamePiece.type = "L";
-        }
-    }
-}
-
-// Move piece
-function moveGamePiece(direction) {
-    if (direction == "LEFT") {
-        // note to self, add bounds check
-        gamePiece.xPosition -= 20;
-    }
-    else if (direction == "RIGHT") {
-        // note to self, add bounds check
-        gamePiece.xPosition += 20;
-    }
-    else {
-        console.log("Unknown game piece move direction: " + direction);
-    }
-}
 
 // Set piece orientation
 function rotateGamePiece(direction) {
     if (direction == "CLOCKWISE"){
-        // The next line wouldn't work as "if (gamePiece.orientation in [1, 2, 3])", why?
         if (gamePiece.orientation == 1 || gamePiece.orientation == 2 || gamePiece.orientation == 3) {
             gamePiece.orientation ++;
         }
@@ -124,115 +82,239 @@ function rotateGamePiece(direction) {
     }
     else {
         console.log("Unknown rotation direction: " + direction);
-    } 
+    }
+    selectGamePiece(gamePiece.orientation, gamePiece.type);
+}
+
+// Move piece
+function moveGamePiece(direction) {
+    if (direction == "LEFT") {
+        if (gamePiece.xPosition + gamePiece.leftBoundary > 0) { 
+            gamePiece.xPosition -= BASE_UNIT_SIZE;
+        }
+    }
+    else if (direction == "RIGHT") {
+        if (gamePiece.xPosition + gamePiece.rightBoundary < canvas.width) {
+            gamePiece.xPosition += BASE_UNIT_SIZE;
+        }
+    }
+    else if (direction == "DOWN") {
+        // move down and test for collision, bottom boundary
+        if (gamePiece.yPosition + BASE_UNIT_SIZE < canvas.height) {
+            gamePiece.yPosition += BASE_UNIT_SIZE;
+        }
+    }
+    else {
+        console.log("Unknown game piece move direction: " + direction);
+    }
+    debugHelper();
 }
 
 
-// Debug testing functionality
-//-------------------------------------------------------------------------
-if (DEBUG == true) {
-    // Reserved
+// Keyboard event listeners and friends
+//------------------------------------------------------------------------------
+
+document.addEventListener('keydown', keyDownHandler, false);
+
+function keyDownHandler(event) {
+    if (event.keyCode == 39) {
+        // Right arrow
+        moveGamePiece("RIGHT");
+    }
+    else if (event.keyCode == 37) {
+        // Left arrow
+        moveGamePiece("LEFT");
+    }
+    else if (event.keyCode == 40) {
+        // Down arrow
+        moveGamePiece("DOWN");
+    }
+    else if (event.keyCode == 38) {
+        // Up arrow
+        rotateGamePiece("CLOCKWISE");
+    }
+    else if (event.keyCode == 32) {
+        // Spacebar
+    }
+    else if (event.keyCode == 81) {
+        // Q key
+        rotateGamePiece("COUNTERCLOCKWISE");
+    }
+    else if (event.keyCode == 87) {
+        // W key
+        rotateGamePiece("CLOCKWISE");
+    }
+    if (DEBUG == true) {
+        // Game piece chooser
+        if (event.keyCode == 73) {
+            gamePiece.type = "I";
+        }
+        else if (event.keyCode == 79) {
+            gamePiece.type = "O";
+        }
+        else if (event.keyCode == 84) {
+            gamePiece.type = "T";
+        }
+        else if (event.keyCode == 83) {
+            gamePiece.type = "S";
+        }
+        else if (event.keyCode == 90) {
+            gamePiece.type = "Z";
+        }
+        else if (event.keyCode == 74) {
+            gamePiece.type = "J";
+        }
+        else if (event.keyCode == 76) {
+            gamePiece.type = "L";
+        }
+        // RDFG movement pad
+        else if (event.keyCode == 68) {
+            gamePiece.xPosition -= BASE_UNIT_SIZE;
+        }
+        else if (event.keyCode == 71) {
+            gamePiece.xPosition += BASE_UNIT_SIZE;
+        }
+        else if (event.keyCode == 82) {
+            gamePiece.yPosition -= BASE_UNIT_SIZE;
+        }
+        else if (event.keyCode == 70) {
+            gamePiece.yPosition += BASE_UNIT_SIZE;
+        }
+    }
 }
 
 
-
-// Selectors for choosing piece and orientation
+// Selectors for retreiving piece template formulas and boundaries
 //-------------------------------------------------------------------------
 
-// Draw the playable piece
-function drawGamePiece(x, y, orientation, type) {
+// Access the correct template
+function selectGamePiece(orientation, type) {
     switch(type) {
         case "I":
-            drawITetromino(x, y, orientation);
+            selectITetromino(orientation);
             break;
         case "O":
-            drawOTetromino(x, y, orientation);
+            selectOTetromino(orientation);
             break;
         case "T":
-            drawTTetromino(x, y, orientation);
+            selectTTetromino(orientation);
             break;
         case "S":
-            drawSTetromino(x, y, orientation);
+            selectSTetromino(orientation);
             break;
         case "Z":
-            drawZTetromino(x, y, orientation);
+            selectZTetromino(orientation);
             break;
         case "J":
-            drawJTetromino(x, y, orientation);
+            selectJTetromino(orientation);
             break;
         case "L":
-            drawLTetromino(x, y, orientation);
+            selectLTetromino(orientation);
             break;
         default: // error
             console.log("Tetromino type error");
     }
-
+    // Bring game piece within boundaries after calling template
+    if (gamePiece.xPosition + gamePiece.leftBoundary < 0) {
+        gamePiece.xPosition += BASE_UNIT_SIZE;
+    }
+    else if (gamePiece.xPosition + gamePiece.rightBoundary > canvas.width) {
+        gamePiece.xPosition -= BASE_UNIT_SIZE;
+    }
 }
 
 
 // "I" Tetromino
-function drawITetromino(x, y, orientation) {
+function selectITetromino(orientation) {
     switch(orientation) {
         case 1: //vertical
         case 3: //vertical
-            context.fillRect(x, y - BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
-            context.fillRect(x, y, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
-            context.fillRect(x, y + BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
-            context.fillRect(x, y + 2 * BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
+            gamePiece.template = [
+                [gamePiece.xPosition, gamePiece.yPosition - BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
+                [gamePiece.xPosition, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
+                [gamePiece.xPosition, gamePiece.yPosition + BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
+                [gamePiece.xPosition, gamePiece.yPosition + 2 * BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE]
+            ];
+            gamePiece.leftBoundary = 0;
+            gamePiece.rightBoundary = BASE_UNIT_SIZE;
             break;
         case 2: //horizontal
         case 4: //horizontal
-            context.fillRect(x - BASE_UNIT_SIZE, y, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
-            context.fillRect(x, y, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
-            context.fillRect(x + BASE_UNIT_SIZE, y, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
-            context.fillRect(x + 2 * BASE_UNIT_SIZE, y, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
+            gamePiece.template = [
+                [gamePiece.xPosition - BASE_UNIT_SIZE, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
+                [gamePiece.xPosition, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
+                [gamePiece.xPosition + BASE_UNIT_SIZE, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
+                [gamePiece.xPosition + 2 * BASE_UNIT_SIZE, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE]
+            ];
+            gamePiece.leftBoundary = - BASE_UNIT_SIZE;
+            gamePiece.rightBoundary = 3 * BASE_UNIT_SIZE;
             break;
         default: // error
             console.log("I Tetromino orientation error")
     }
 }
 // "O" Tetromino
-function drawOTetromino(x, y, orientation) {
+function selectOTetromino(orientation) {
     switch(orientation) {
         case 1: // it's
         case 2: // a
         case 3: // square
         case 4: // !
-            context.fillRect(x, y, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
-            context.fillRect(x, y + BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
-            context.fillRect(x + BASE_UNIT_SIZE, y, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
-            context.fillRect(x + BASE_UNIT_SIZE, y + BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
+            gamePiece.template = [
+                [gamePiece.xPosition, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
+                [gamePiece.xPosition, gamePiece.yPosition + BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
+                [gamePiece.xPosition + BASE_UNIT_SIZE, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
+                [gamePiece.xPosition + BASE_UNIT_SIZE, gamePiece.yPosition + BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE]
+            ]
+            gamePiece.leftBoundary = 0;
+            gamePiece.rightBoundary = 2 * BASE_UNIT_SIZE;
             break;
         default: // error
             console.log("O Tetromino orientation error");
     }   
 }
 // "T" Tetromino
-function drawTTetromino(x, y, orientation) {
+function selectTTetromino(orientation) {
     switch(orientation) {
         case 1: // facing down
-            context.fillRect(x, y, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
-            context.fillRect(x - BASE_UNIT_SIZE, y, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
-            context.fillRect(x + BASE_UNIT_SIZE, y, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
-            context.fillRect(x, y + BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
+            gamePiece.template = [
+                [gamePiece.xPosition, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
+                [gamePiece.xPosition - BASE_UNIT_SIZE, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
+                [gamePiece.xPosition + BASE_UNIT_SIZE, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
+                [gamePiece.xPosition, gamePiece.yPosition + BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE]
+            ]
+            gamePiece.leftBoundary = - BASE_UNIT_SIZE;
+            gamePiece.rightBoundary = 2 * BASE_UNIT_SIZE;
             break;
         case 2: // facing left
-            context.fillRect(x, y - BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
-            context.fillRect(x, y, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
-            context.fillRect(x, y + BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
-            context.fillRect(x - BASE_UNIT_SIZE, y, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
+            gamePiece.template = [
+                [gamePiece.xPosition, gamePiece.yPosition - BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
+                [gamePiece.xPosition, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
+                [gamePiece.xPosition, gamePiece.yPosition + BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
+                [gamePiece.xPosition - BASE_UNIT_SIZE, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE]
+            ]
+            gamePiece.leftBoundary = - BASE_UNIT_SIZE;
+            gamePiece.rightBoundary = BASE_UNIT_SIZE;
             break;
         case 3: // facing up
-            context.fillRect(x - BASE_UNIT_SIZE, y, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
-            context.fillRect(x, y, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
-            context.fillRect(x + BASE_UNIT_SIZE, y, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
-            context.fillRect(x, y - BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
+            gamePiece.template = [
+                [gamePiece.xPosition - BASE_UNIT_SIZE, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
+                [gamePiece.xPosition, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
+                [gamePiece.xPosition + BASE_UNIT_SIZE, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
+                [gamePiece.xPosition, gamePiece.yPosition - BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE]
+            ]
+            gamePiece.leftBoundary = - BASE_UNIT_SIZE;
+            gamePiece.rightBoundary = 2 * BASE_UNIT_SIZE;
             break;
         case 4: // facing right
-            context.fillRect(x, y - BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
-            context.fillRect(x, y, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
-            context.fillRect(x, y + BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
-            context.fillRect(x + BASE_UNIT_SIZE, y, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
+            gamePiece.template = [
+                [gamePiece.xPosition, gamePiece.yPosition - BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
+                [gamePiece.xPosition, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
+                [gamePiece.xPosition, gamePiece.yPosition + BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
+                [gamePiece.xPosition + BASE_UNIT_SIZE, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE]
+            ]
+            gamePiece.leftBoundary = 0;
+            gamePiece.rightBoundary = 2 * BASE_UNIT_SIZE;
             break;
         default: // error
             console.log("T Tetromino orientation error");
@@ -240,104 +322,152 @@ function drawTTetromino(x, y, orientation) {
     }
 }
 // "J" Tetromino
-function drawJTetromino(x, y, orientation) {
+function selectJTetromino(orientation) {
     switch(orientation) {
         case 1: // facing left
-            context.fillRect(x - BASE_UNIT_SIZE, y, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
-            context.fillRect(x, y, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
-            context.fillRect(x + BASE_UNIT_SIZE, y, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
-            context.fillRect(x + BASE_UNIT_SIZE, y + BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
+            gamePiece.template = [
+                [gamePiece.xPosition - BASE_UNIT_SIZE, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
+                [gamePiece.xPosition, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
+                [gamePiece.xPosition + BASE_UNIT_SIZE, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
+                [gamePiece.xPosition + BASE_UNIT_SIZE, gamePiece.yPosition + BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE]
+            ]
+            gamePiece.leftBoundary = - BASE_UNIT_SIZE;
+            gamePiece.rightBoundary = 2 * BASE_UNIT_SIZE;
             break;
         case 2: // facing up
-            context.fillRect(x, y - BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
-            context.fillRect(x, y, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
-            context.fillRect(x, y + BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
-            context.fillRect(x - BASE_UNIT_SIZE, y + BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
+            gamePiece.template = [
+                [gamePiece.xPosition, gamePiece.yPosition - BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
+                [gamePiece.xPosition, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
+                [gamePiece.xPosition, gamePiece.yPosition + BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
+                [gamePiece.xPosition - BASE_UNIT_SIZE, gamePiece.yPosition + BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE]
+            ]
+            gamePiece.leftBoundary = - BASE_UNIT_SIZE;
+            gamePiece.rightBoundary = BASE_UNIT_SIZE;
             break;
         case 3: // facing right
-            context.fillRect(x - BASE_UNIT_SIZE, y - BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
-            context.fillRect(x - BASE_UNIT_SIZE, y, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
-            context.fillRect(x, y, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
-            context.fillRect(x + BASE_UNIT_SIZE, y, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
+            gamePiece.template = [
+                [gamePiece.xPosition - BASE_UNIT_SIZE, gamePiece.yPosition - BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
+                [gamePiece.xPosition - BASE_UNIT_SIZE, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
+                [gamePiece.xPosition, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
+                [gamePiece.xPosition + BASE_UNIT_SIZE, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE]
+            ]
+            gamePiece.leftBoundary = - BASE_UNIT_SIZE;
+            gamePiece.rightBoundary = 2 * BASE_UNIT_SIZE;
             break;
         case 4: // facing down
-            context.fillRect(x, y - BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
-            context.fillRect(x + BASE_UNIT_SIZE, y - BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
-            context.fillRect(x, y, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
-            context.fillRect(x, y + BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
+            gamePiece.template = [
+                [gamePiece.xPosition, gamePiece.yPosition - BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
+                [gamePiece.xPosition + BASE_UNIT_SIZE, gamePiece.yPosition - BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
+                [gamePiece.xPosition, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
+                [gamePiece.xPosition, gamePiece.yPosition + BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE]
+            ]
+            gamePiece.leftBoundary = 0;
+            gamePiece.rightBoundary = 2 * BASE_UNIT_SIZE;
             break;
         default: // error
             console.log("J Tetromino orientation error");
     }
 }
 // "L" Tetromino
-function drawLTetromino(x, y, orientation) {
+function selectLTetromino(orientation) {
     switch(orientation) {
         case 1: // facing right
-            context.fillRect(x - BASE_UNIT_SIZE, y, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
-            context.fillRect(x, y, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
-            context.fillRect(x + BASE_UNIT_SIZE, y, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
-            context.fillRect(x - BASE_UNIT_SIZE, y + BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
+            gamePiece.template = [
+                [gamePiece.xPosition - BASE_UNIT_SIZE, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
+                [gamePiece.xPosition, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
+                [gamePiece.xPosition + BASE_UNIT_SIZE, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
+                [gamePiece.xPosition - BASE_UNIT_SIZE, gamePiece.yPosition + BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE]
+            ]
+            gamePiece.leftBoundary = - BASE_UNIT_SIZE;
+            gamePiece.rightBoundary = 2 * BASE_UNIT_SIZE;
             break;
         case 2: // facing down
-            context.fillRect(x - BASE_UNIT_SIZE, y - BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
-            context.fillRect(x, y - BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
-            context.fillRect(x, y, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
-            context.fillRect(x, y + BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
+            gamePiece.template = [
+                [gamePiece.xPosition - BASE_UNIT_SIZE, gamePiece.yPosition - BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
+                [gamePiece.xPosition, gamePiece.yPosition - BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
+                [gamePiece.xPosition, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
+                [gamePiece.xPosition, gamePiece.yPosition + BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE]
+            ]
+            gamePiece.leftBoundary = - BASE_UNIT_SIZE;
+            gamePiece.rightBoundary = BASE_UNIT_SIZE;
             break;
         case 3: // facing left
-            context.fillRect(x - BASE_UNIT_SIZE, y, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
-            context.fillRect(x, y, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
-            context.fillRect(x + BASE_UNIT_SIZE, y, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
-            context.fillRect(x + BASE_UNIT_SIZE, y - BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
+            gamePiece.template = [
+                [gamePiece.xPosition - BASE_UNIT_SIZE, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
+                [gamePiece.xPosition, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
+                [gamePiece.xPosition + BASE_UNIT_SIZE, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
+                [gamePiece.xPosition + BASE_UNIT_SIZE, gamePiece.yPosition - BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE]
+            ]
+            gamePiece.leftBoundary = - BASE_UNIT_SIZE;
+            gamePiece.rightBoundary = 2 * BASE_UNIT_SIZE;
             break;
         case 4: // facing up
-            context.fillRect(x, y - BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
-            context.fillRect(x, y, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
-            context.fillRect(x, y + BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
-            context.fillRect(x + BASE_UNIT_SIZE, y + BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
+            gamePiece.template = [
+                [gamePiece.xPosition, gamePiece.yPosition - BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
+                [gamePiece.xPosition, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
+                [gamePiece.xPosition, gamePiece.yPosition + BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
+                [gamePiece.xPosition + BASE_UNIT_SIZE, gamePiece.yPosition + BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE]
+            ]
+            gamePiece.leftBoundary = 0;
+            gamePiece.rightBoundary = 2 * BASE_UNIT_SIZE;
             break;
         default: // error
             console.log("L Tetromino orientation error");
     }
 }
 // "S" Tetromino
-function drawSTetromino(x, y, orientation) {
+function selectSTetromino(orientation) {
     switch(orientation) {
         case 1: // vertical
         case 3: // vertical
-            context.fillRect(x, y - BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
-            context.fillRect(x, y, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
-            context.fillRect(x + BASE_UNIT_SIZE, y, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
-            context.fillRect(x + BASE_UNIT_SIZE, y + BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
+            gamePiece.template = [
+                [gamePiece.xPosition, gamePiece.yPosition - BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
+                [gamePiece.xPosition, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
+                [gamePiece.xPosition + BASE_UNIT_SIZE, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
+                [gamePiece.xPosition + BASE_UNIT_SIZE, gamePiece.yPosition + BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE]
+            ]
+            gamePiece.leftBoundary = 0;
+            gamePiece.rightBoundary = 2 * BASE_UNIT_SIZE;
             break;
         case 2: // horizontal
         case 4: // horizontal
-            context.fillRect(x, y, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
-            context.fillRect(x + BASE_UNIT_SIZE, y, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
-            context.fillRect(x, y + BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
-            context.fillRect(x - BASE_UNIT_SIZE, y + BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
+            gamePiece.template = [
+                [gamePiece.xPosition, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
+                [gamePiece.xPosition + BASE_UNIT_SIZE, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
+                [gamePiece.xPosition, gamePiece.yPosition + BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
+                [gamePiece.xPosition - BASE_UNIT_SIZE, gamePiece.yPosition + BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE]
+            ]
+            gamePiece.leftBoundary = - BASE_UNIT_SIZE;
+            gamePiece.rightBoundary = 2 * BASE_UNIT_SIZE;
             break;
         default: // error
             console.log("S Tetromino orientation error");
     }
 }
 // "Z" Tetromino
-function drawZTetromino(x, y, orientation) {
+function selectZTetromino(orientation) {
     switch(orientation) {
         case 1: // horizontal
         case 3: // horizontal
-            context.fillRect(x - BASE_UNIT_SIZE, y, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
-            context.fillRect(x, y, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
-            context.fillRect(x, y + BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
-            context.fillRect(x + BASE_UNIT_SIZE, y + BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
+            gamePiece.template = [
+                [gamePiece.xPosition - BASE_UNIT_SIZE, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
+                [gamePiece.xPosition, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
+                [gamePiece.xPosition, gamePiece.yPosition + BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
+                [gamePiece.xPosition + BASE_UNIT_SIZE, gamePiece.yPosition + BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE]
+            ]
+            gamePiece.leftBoundary = - BASE_UNIT_SIZE;
+            gamePiece.rightBoundary = 2 * BASE_UNIT_SIZE;
             break;
         case 2: // vertical
         case 4: // vertical
-            context.fillRect(x, y, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
-            context.fillRect(x + BASE_UNIT_SIZE, y, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
-            context.fillRect(x + BASE_UNIT_SIZE, y - BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
-            context.fillRect(x, y + BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE);
+            gamePiece.template = [
+                [gamePiece.xPosition, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
+                [gamePiece.xPosition + BASE_UNIT_SIZE, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
+                [gamePiece.xPosition + BASE_UNIT_SIZE, gamePiece.yPosition - BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
+                [gamePiece.xPosition, gamePiece.yPosition + BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE]
+            ]
+            gamePiece.leftBoundary = 0;
+            gamePiece.rightBoundary = 2 * BASE_UNIT_SIZE;
             break;
         default: // error
             console.log("Z Tetromino orientation error");
@@ -345,3 +475,16 @@ function drawZTetromino(x, y, orientation) {
     }
 }
 
+
+// Debug testing functionality
+//-------------------------------------------------------------------------
+
+if (DEBUG == true) {
+    fallSpeed = 0;
+}
+
+function debugHelper() {
+    if (DEBUG == true) {
+        console.log("Game piece X, Y coords: " + gamePiece.xPosition + ", " + gamePiece.yPosition);
+    }
+}

@@ -4,12 +4,12 @@
 var canvas = document.getElementById("gameCanvas");
 var context = canvas.getContext("2d");
 
-var baseUnitSize = 30; // Tetromino block size in pixels, this value scales everything
+var baseUnitSize = 40; // Tetromino block size in pixels, this value scales everything
 const FPS = 30; // Frames per second
 const TETROMINOS = ["I", "O", "T", "S", "Z", "J", "L"];
 const DEBUG = false; // Enable testing functionality (read: cheats)
 
-// Make canvas size scale with piece size
+// Make canvas size scale with piece size, all functionality retained across all gameboard sizes as well
 var width = 10;
 var height = 20;
 canvas.width = baseUnitSize * width;
@@ -61,20 +61,72 @@ function randomTheme() {
 
 
 // Main game loop
-//--------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------
+
+var gameState = 1;
 
 // Canvas rendering
 window.onload = function() {
     randomTheme();
     newRound();
     setInterval(function() {
-        context.clearRect(0, 0, canvas.width, canvas.height);
-        gamePiece.updateTemplate(); // required because gamePiece.template does not dynamically update with xPosition and yPosition
-        detectCollision();
-        gravity();
-        drawGamePiece();
-        drawFallenPieces();
+        if (gameState == 1) {
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            gamePiece.updateTemplate(); // required because gamePiece.template does not dynamically update with xPosition and yPosition
+            detectCollision();
+            gravity();
+            drawGamePiece();
+            drawFallenPieces();
+            drawStats();
+        }
+        else if (gameState == 0) {
+            drawStats();
+            drawGameOver();
+        }
     }, 1000/FPS)
+}
+
+// Scoring and loss conditions
+//---------------------------------------------------------------------------------
+
+// Player stats and scorekeeping
+var playerScore = 0
+
+// Render player stats and score
+function drawStats() {
+    context.font = (baseUnitSize / 2) + "px Monaco";
+    context.fillStyle = "555";
+    context.textAlign = "left";
+    context.fillText("Score: " + playerScore, baseUnitSize, baseUnitSize);
+}
+
+// Render game over screen
+function drawGameOver() {
+    context.font = (baseUnitSize / 2) + "px Monaco";
+    context.fillStyle = "555";
+    context.textAlign = "center";
+    context.fillText("GAME OVER", (canvas.width / 2), (canvas.height / 4));
+    context.fillText("Refresh page to play again", (canvas.width / 2), (canvas.height / 3));
+}
+
+// Assign points for clearing rows, bonus points for clearning more than 1 row at once
+function givePoints(rowsCleared) {
+    if (rowsCleared == 1) {
+        playerScore += 10;
+    }
+    else {
+        playerScore += 20 * rowsCleared;
+    }
+}
+
+// Loss condition
+function checkLoss() {
+    for (i = 0; i < 4; i++) {
+        if (gamePiece.template[i][1] <= 0) {
+            // Game over!
+            gameState = 0;
+        }
+    }
 }
 
 
@@ -126,7 +178,7 @@ function newRound() {
 // Create a new tetromino
 function newGamePiece() {
     gamePiece.xPosition = canvas.width / 2;
-    gamePiece.yPosition = 0;
+    gamePiece.yPosition = - 3 * baseUnitSize;
     gamePiece.orientation = Math.floor((Math.random() * 4) + 1);
     gamePiece.type = TETROMINOS[Math.floor(Math.random() * TETROMINOS.length)];
     gamePiece.color = Math.floor(Math.random() * colors.length);
@@ -172,6 +224,7 @@ function detectCollision() {
             if (gamePiece.template[i][0] == fallenPieces[j][0] && 
                 gamePiece.template[i][1] + baseUnitSize + baseUnitSize / 10 >= fallenPieces[j][1]) {
                     alignGamePiece(gamePiece.template[i][1] + baseUnitSize, fallenPieces[j][1]);
+                    checkLoss();
                     saveToFallen();
                     detectCompleteRows();
                     newRound();
@@ -181,6 +234,7 @@ function detectCollision() {
     }  
 }
 
+var rowsCleared = 0;
 // Check for full rows by top left corner of block, recursively
 function detectCompleteRows() {
     snapToGrid();
@@ -191,18 +245,21 @@ function detectCompleteRows() {
         for (let j = 0; j < canvas.width; j += baseUnitSize) { // check each row from left to right
             for (let k = 0; k < fallenPieces.length; k++) { // look at each fallen block
                 if (fallenPieces[k][1] == i && 
-                    fallenPieces[k][0] == j) { // count how many blocks
+                    fallenPieces[k][0] == j) { // count how many blocks are in the row
                         totalBlockCount ++;
                 }
             }
             if (totalBlockCount >= totalPossible) {
                 clearRow(i);
                 shiftRowsDown(i);
+                rowsCleared++;
                 detectCompleteRows();
                 return;
             }
         }
     }
+    givePoints(rowsCleared);
+    rowsCleared = 0;
 }
 
 // Clear completed row, recursively
@@ -692,7 +749,7 @@ function selectZTetromino(orientation) {
 //-------------------------------------------------------------------------
 
 if (DEBUG == true) {
-    fallSpeed = 0;
+    // Reserved
 }
 
 function debugHelper() {

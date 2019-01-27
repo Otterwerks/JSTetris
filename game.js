@@ -4,15 +4,16 @@
 var canvas = document.getElementById("gameCanvas");
 var context = canvas.getContext("2d");
 
-const BASE_UNIT_SIZE = 20; // Tetromino block size in pixels, this value scales everything
+var baseUnitSize = 30; // Tetromino block size in pixels, this value scales everything
 const FPS = 30; // Frames per second
 const TETROMINOS = ["I", "O", "T", "S", "Z", "J", "L"];
-const COLORS = ["red", "green", "blue", "purple", "yellow", "orange", "pink"];
 const DEBUG = false; // Enable testing functionality (read: cheats)
 
-// Make canvas scale with piece size
-canvas.width = BASE_UNIT_SIZE * 10;
-canvas.height = BASE_UNIT_SIZE * 20;
+// Make canvas size scale with piece size
+var width = 10;
+var height = 20;
+canvas.width = baseUnitSize * width;
+canvas.height = baseUnitSize * height;
 
 // The playable piece, declared as object literal with placeholder attributes
 var gamePiece = {
@@ -33,11 +34,38 @@ var gamePiece = {
 };
 
 
+// Colors and Themes
+//--------------------------------------------------------------------------------
+var colors = ["red", "green", "blue", "purple", "yellow", "orange", "pink"];
+
+// const THEME_99 = ["", "", "", "", ""]; copy paste for adding new theme
+
+// Array to feed randomTheme();
+themes = [
+    ["ED6A5A", "F4F1BB", "9BC1BC", "7D7C84", "E6EBE0"], // theme 1
+    ["FBF5F3", "522B47", "7B0828", "7D7C84", "0F0E0E"], // theme 2
+    ["FF715B", "522B47", "FFFFFF", "7D7C84", "1EA896"], // theme 3
+    ["F4E76E", "F7FE72", "8FF7A7", "7D7C84", "51BBFE"], // theme 4
+    ["FFEEF2", "FFE4F3", "FFC8FB", "7D7C84", "FF92C2"], // theme 5
+    ["3D5A80", "98C1D9", "E0FBFC", "EE6C4D", "293241"], // theme 6
+    ["D8A47F", "EF8354", "EE4B6A", "DF3B57", "0F7173"], // theme 7
+    ["725752", "878E88", "96C0B7", "D4DFC7", "FEF6C9"], // theme 8
+    ["DBF4AD", "A9E190", "CDC776", "A5AA52", "767522"], // theme 9
+    ["EAF2E3", "61E8E1", "F25757", "F2E863", "F2CD60"], // theme 10
+];
+
+// Load random theme
+function randomTheme() {
+    colors = themes[Math.floor(Math.random() * themes.length)];
+}
+
+
 // Main game loop
 //--------------------------------------------------------------------------------
 
 // Canvas rendering
 window.onload = function() {
+    randomTheme();
     newRound();
     setInterval(function() {
         context.clearRect(0, 0, canvas.width, canvas.height);
@@ -58,7 +86,7 @@ var fallSpeed = 1; // base units per second
 // Make game piece fall down
 function gravity() {
     if (gamePiece.yPosition < canvas.height) {
-        gamePiece.yPosition += fallSpeed * BASE_UNIT_SIZE / (1000 / FPS);
+        gamePiece.yPosition += fallSpeed * baseUnitSize / (1000 / FPS);
     }
 }
 
@@ -66,10 +94,10 @@ function gravity() {
 function drawGamePiece() {
     for (let i = 0; i < 4; i++) {
         context.beginPath();
-        context.fillStyle = COLORS[gamePiece.color];
-        context.lineWidth = BASE_UNIT_SIZE / 10;
+        context.fillStyle = colors[gamePiece.color];
+        context.lineWidth = baseUnitSize / 10;
         context.strokeStyle = "black";
-        context.rect(gamePiece.template[i][0], gamePiece.template[i][1], gamePiece.template[i][2], gamePiece.template[i][3]);
+        context.rect(gamePiece.template[i][0], gamePiece.template[i][1], baseUnitSize, baseUnitSize);
         context.fill();
         context.stroke();
     }
@@ -79,10 +107,10 @@ function drawGamePiece() {
 function drawFallenPieces() {
     for (let i = 0; i < fallenPieces.length; i++) {
         context.beginPath();
-        context.fillStyle = COLORS[fallenPieces[i][4]];
-        context.lineWidth = BASE_UNIT_SIZE / 10;
+        context.fillStyle = colors[fallenPieces[i][2]];
+        context.lineWidth = baseUnitSize / 10;
         context.strokeStyle = "black";
-        context.rect(fallenPieces[i][0], fallenPieces[i][1], fallenPieces[i][2], fallenPieces[i][3]);
+        context.rect(fallenPieces[i][0], fallenPieces[i][1], baseUnitSize, baseUnitSize);
         context.fill();
         context.stroke();
     }
@@ -91,6 +119,7 @@ function drawFallenPieces() {
 // Set up a new round
 function newRound() {
     fallSpeed = 1;
+    allowDown = true;
     newGamePiece();
 }
 
@@ -100,31 +129,53 @@ function newGamePiece() {
     gamePiece.yPosition = 0;
     gamePiece.orientation = Math.floor((Math.random() * 4) + 1);
     gamePiece.type = TETROMINOS[Math.floor(Math.random() * TETROMINOS.length)];
-    gamePiece.color = Math.floor(Math.random() * COLORS.length);
+    gamePiece.color = Math.floor(Math.random() * colors.length);
     gamePiece.updateTemplate();
+}
+
+// Collision detection helper function, prevents fallthroughs
+function willCollide() {
+    for (let i = 0; i < 4; i++) {
+        if (gamePiece.template[i][1] + 2 * baseUnitSize >= canvas.height) {
+            if (fallSpeed >= 10) {
+                fallSpeed /= 10;
+            }
+            allowDown = false;
+        }
+        for (let j = 0; j < fallenPieces.length; j++) {
+            if (gamePiece.template[i][0] == fallenPieces[j][0] && 
+                gamePiece.template[i][1] + 2 * baseUnitSize >= fallenPieces[j][1]) {
+                    if (fallSpeed >= 10) {
+                        fallSpeed /= 10;
+                    }
+                    allowDown = false;
+            }
+        }
+    }
 }
 
 // Collision detection
 // Consider hitboxes of playable tetromino subsquares as bottom left corner points
 // Consider hitboxes of fallen tetromino subsquares as top left corner points
-// Compare for match
+// Compare for match, this function has trouble at high speed without willCollide();
 function detectCollision() {
+    willCollide();
     for (let i = 0; i < 4; i++) {
-        if (gamePiece.template[i][1] + BASE_UNIT_SIZE + BASE_UNIT_SIZE / 10 >= canvas.height) {
-            alignGamePiece(gamePiece.template[i][1] + BASE_UNIT_SIZE, canvas.height);
+        if (gamePiece.template[i][1] + baseUnitSize + baseUnitSize / 10 >= canvas.height) {
+            alignGamePiece(gamePiece.template[i][1] + baseUnitSize, canvas.height);
             saveToFallen();
             detectCompleteRows();
             newRound();
             return;
         }
         for (let j = 0; j < fallenPieces.length; j++) {
-            if (gamePiece.template[i][0] == fallenPieces[j][0] && gamePiece.template[i][1] + BASE_UNIT_SIZE + BASE_UNIT_SIZE / 10 >= fallenPieces[j][1]) {
-                alignGamePiece(gamePiece.template[i][1] + BASE_UNIT_SIZE, fallenPieces[j][1]);
-                saveToFallen();
-                detectCompleteRows();
-                newRound();
-                console.log("Collision at: " + fallenPieces[j][1]);
-                return;
+            if (gamePiece.template[i][0] == fallenPieces[j][0] && 
+                gamePiece.template[i][1] + baseUnitSize + baseUnitSize / 10 >= fallenPieces[j][1]) {
+                    alignGamePiece(gamePiece.template[i][1] + baseUnitSize, fallenPieces[j][1]);
+                    saveToFallen();
+                    detectCompleteRows();
+                    newRound();
+                    return;
             }
         }
     }  
@@ -133,26 +184,23 @@ function detectCollision() {
 // Check for full rows by top left corner of block, recursively
 function detectCompleteRows() {
     snapToGrid();
-    let totalPossible = canvas.width / BASE_UNIT_SIZE;
+    let totalPossible = canvas.width / baseUnitSize;
     let totalBlockCount = 0;
-    for (let i = 0; i < canvas.height; i += BASE_UNIT_SIZE) { // start at the top and go down row by row
+    for (let i = 0; i < canvas.height; i += baseUnitSize) { // start at the top and go down row by row
         totalBlockCount = 0;
-        for (let j = 0; j < canvas.width; j += BASE_UNIT_SIZE) { // check each row from left to right
+        for (let j = 0; j < canvas.width; j += baseUnitSize) { // check each row from left to right
             for (let k = 0; k < fallenPieces.length; k++) { // look at each fallen block
-                if (fallenPieces[k][1] == i && fallenPieces[k][0] == j) { // count how many blocks
-                    totalBlockCount ++;
+                if (fallenPieces[k][1] == i && 
+                    fallenPieces[k][0] == j) { // count how many blocks
+                        totalBlockCount ++;
                 }
             }
             if (totalBlockCount >= totalPossible) {
-                console.log("Row " + (i / BASE_UNIT_SIZE) + " cleared, " + totalBlockCount + "/" + totalPossible);
                 clearRow(i);
                 shiftRowsDown(i);
                 detectCompleteRows();
                 return;
             }
-        }
-        if (totalBlockCount != 0) {
-            console.log("Row: " + (i / BASE_UNIT_SIZE) + ", blocks: " + totalBlockCount);
         }
     }
 }
@@ -172,11 +220,10 @@ function clearRow(row) {
 function shiftRowsDown(row) {
     for (let i = 0; i < fallenPieces.length; i++) {
         if (fallenPieces[i][1] <= row) {
-            fallenPieces[i][1] += BASE_UNIT_SIZE;
+            fallenPieces[i][1] += baseUnitSize;
         }
     }
 }
-
 
 // Set alignment on tetromino before saving as fallen
 function alignGamePiece(currentPosition, referencePosition) {
@@ -190,14 +237,14 @@ function alignGamePiece(currentPosition, referencePosition) {
 function snapToGrid() {
     for (let i = 0; i < fallenPieces.length; i++) {
         for (let j = 0; j < 2; j++) {
-            if (fallenPieces[i][j] % BASE_UNIT_SIZE == 0) {
+            if (fallenPieces[i][j] % baseUnitSize == 0) {
                 // pass
             }
-            else if (fallenPieces[i][j] % BASE_UNIT_SIZE < BASE_UNIT_SIZE / 2) {
-                fallenPieces[i][j] -= fallenPieces[i][j] % BASE_UNIT_SIZE;
+            else if (fallenPieces[i][j] % baseUnitSize < baseUnitSize / 2) {
+                fallenPieces[i][j] -= fallenPieces[i][j] % baseUnitSize;
             }
             else {
-                fallenPieces[i][j] += BASE_UNIT_SIZE - fallenPieces[i][j] % BASE_UNIT_SIZE;
+                fallenPieces[i][j] += baseUnitSize - fallenPieces[i][j] % baseUnitSize;
             }
         }
     }
@@ -246,17 +293,17 @@ function rotateGamePiece(direction) {
 function moveGamePiece(direction) {
     if (direction == "LEFT") {
         if (gamePiece.xPosition + gamePiece.leftBoundary > 0) { 
-            gamePiece.xPosition -= BASE_UNIT_SIZE;
+            gamePiece.xPosition -= baseUnitSize;
         }
     }
     else if (direction == "RIGHT") {
         if (gamePiece.xPosition + gamePiece.rightBoundary < canvas.width) {
-            gamePiece.xPosition += BASE_UNIT_SIZE;
+            gamePiece.xPosition += baseUnitSize;
         }
     }
     else if (direction == "DOWN") {
-        if (gamePiece.yPosition + BASE_UNIT_SIZE < canvas.height) {
-            gamePiece.yPosition += BASE_UNIT_SIZE;
+        if (gamePiece.yPosition + baseUnitSize < canvas.height && allowDown == true) {
+            gamePiece.yPosition += baseUnitSize;
         }
     }
     else {
@@ -333,19 +380,19 @@ function keyDownHandler(event) {
         // RDFG movement pad without boundaries
         else if (event.keyCode == 68) {
             // D key
-            gamePiece.xPosition -= BASE_UNIT_SIZE;
+            gamePiece.xPosition -= baseUnitSize;
         }
         else if (event.keyCode == 71) {
             // G key
-            gamePiece.xPosition += BASE_UNIT_SIZE;
+            gamePiece.xPosition += baseUnitSize;
         }
         else if (event.keyCode == 82) {
             // R key
-            gamePiece.yPosition -= BASE_UNIT_SIZE;
+            gamePiece.yPosition -= baseUnitSize;
         }
         else if (event.keyCode == 70) {
             // F key
-            gamePiece.yPosition += BASE_UNIT_SIZE;
+            gamePiece.yPosition += baseUnitSize;
         }
     }
 }
@@ -383,10 +430,10 @@ function selectGamePiece(orientation, type) {
     }
     // Bring game piece within boundaries after calling template
     if (gamePiece.xPosition + gamePiece.leftBoundary < 0) {
-        gamePiece.xPosition += BASE_UNIT_SIZE;
+        gamePiece.xPosition += baseUnitSize;
     }
     else if (gamePiece.xPosition + gamePiece.rightBoundary > canvas.width) {
-        gamePiece.xPosition -= BASE_UNIT_SIZE;
+        gamePiece.xPosition -= baseUnitSize;
     }
 }
 
@@ -397,24 +444,24 @@ function selectITetromino(orientation) {
         case 1: //vertical
         case 3: //vertical
             gamePiece.template = [
-                [gamePiece.xPosition, gamePiece.yPosition - BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
-                [gamePiece.xPosition, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
-                [gamePiece.xPosition, gamePiece.yPosition + BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
-                [gamePiece.xPosition, gamePiece.yPosition + 2 * BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE]
+                [gamePiece.xPosition, gamePiece.yPosition - baseUnitSize],
+                [gamePiece.xPosition, gamePiece.yPosition],
+                [gamePiece.xPosition, gamePiece.yPosition + baseUnitSize],
+                [gamePiece.xPosition, gamePiece.yPosition + 2 * baseUnitSize]
             ];
             gamePiece.leftBoundary = 0;
-            gamePiece.rightBoundary = BASE_UNIT_SIZE;
+            gamePiece.rightBoundary = baseUnitSize;
             break;
         case 2: //horizontal
         case 4: //horizontal
             gamePiece.template = [
-                [gamePiece.xPosition - BASE_UNIT_SIZE, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
-                [gamePiece.xPosition, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
-                [gamePiece.xPosition + BASE_UNIT_SIZE, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
-                [gamePiece.xPosition + 2 * BASE_UNIT_SIZE, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE]
+                [gamePiece.xPosition - baseUnitSize, gamePiece.yPosition],
+                [gamePiece.xPosition, gamePiece.yPosition],
+                [gamePiece.xPosition + baseUnitSize, gamePiece.yPosition],
+                [gamePiece.xPosition + 2 * baseUnitSize, gamePiece.yPosition]
             ];
-            gamePiece.leftBoundary = - BASE_UNIT_SIZE;
-            gamePiece.rightBoundary = 3 * BASE_UNIT_SIZE;
+            gamePiece.leftBoundary = - baseUnitSize;
+            gamePiece.rightBoundary = 3 * baseUnitSize;
             break;
         default: // error
             console.log("I Tetromino orientation error")
@@ -428,13 +475,13 @@ function selectOTetromino(orientation) {
         case 3: // square
         case 4: // !
             gamePiece.template = [
-                [gamePiece.xPosition, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
-                [gamePiece.xPosition, gamePiece.yPosition + BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
-                [gamePiece.xPosition + BASE_UNIT_SIZE, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
-                [gamePiece.xPosition + BASE_UNIT_SIZE, gamePiece.yPosition + BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE]
+                [gamePiece.xPosition, gamePiece.yPosition],
+                [gamePiece.xPosition, gamePiece.yPosition + baseUnitSize],
+                [gamePiece.xPosition + baseUnitSize, gamePiece.yPosition],
+                [gamePiece.xPosition + baseUnitSize, gamePiece.yPosition + baseUnitSize]
             ]
             gamePiece.leftBoundary = 0;
-            gamePiece.rightBoundary = 2 * BASE_UNIT_SIZE;
+            gamePiece.rightBoundary = 2 * baseUnitSize;
             break;
         default: // error
             console.log("O Tetromino orientation error");
@@ -445,43 +492,43 @@ function selectTTetromino(orientation) {
     switch(orientation) {
         case 1: // facing down
             gamePiece.template = [
-                [gamePiece.xPosition, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
-                [gamePiece.xPosition - BASE_UNIT_SIZE, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
-                [gamePiece.xPosition + BASE_UNIT_SIZE, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
-                [gamePiece.xPosition, gamePiece.yPosition + BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE]
+                [gamePiece.xPosition, gamePiece.yPosition],
+                [gamePiece.xPosition - baseUnitSize, gamePiece.yPosition],
+                [gamePiece.xPosition + baseUnitSize, gamePiece.yPosition],
+                [gamePiece.xPosition, gamePiece.yPosition + baseUnitSize]
             ]
-            gamePiece.leftBoundary = - BASE_UNIT_SIZE;
-            gamePiece.rightBoundary = 2 * BASE_UNIT_SIZE;
+            gamePiece.leftBoundary = - baseUnitSize;
+            gamePiece.rightBoundary = 2 * baseUnitSize;
             break;
         case 2: // facing left
             gamePiece.template = [
-                [gamePiece.xPosition, gamePiece.yPosition - BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
-                [gamePiece.xPosition, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
-                [gamePiece.xPosition, gamePiece.yPosition + BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
-                [gamePiece.xPosition - BASE_UNIT_SIZE, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE]
+                [gamePiece.xPosition, gamePiece.yPosition - baseUnitSize],
+                [gamePiece.xPosition, gamePiece.yPosition],
+                [gamePiece.xPosition, gamePiece.yPosition + baseUnitSize],
+                [gamePiece.xPosition - baseUnitSize, gamePiece.yPosition]
             ]
-            gamePiece.leftBoundary = - BASE_UNIT_SIZE;
-            gamePiece.rightBoundary = BASE_UNIT_SIZE;
+            gamePiece.leftBoundary = - baseUnitSize;
+            gamePiece.rightBoundary = baseUnitSize;
             break;
         case 3: // facing up
             gamePiece.template = [
-                [gamePiece.xPosition - BASE_UNIT_SIZE, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
-                [gamePiece.xPosition, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
-                [gamePiece.xPosition + BASE_UNIT_SIZE, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
-                [gamePiece.xPosition, gamePiece.yPosition - BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE]
+                [gamePiece.xPosition - baseUnitSize, gamePiece.yPosition],
+                [gamePiece.xPosition, gamePiece.yPosition],
+                [gamePiece.xPosition + baseUnitSize, gamePiece.yPosition],
+                [gamePiece.xPosition, gamePiece.yPosition - baseUnitSize]
             ]
-            gamePiece.leftBoundary = - BASE_UNIT_SIZE;
-            gamePiece.rightBoundary = 2 * BASE_UNIT_SIZE;
+            gamePiece.leftBoundary = - baseUnitSize;
+            gamePiece.rightBoundary = 2 * baseUnitSize;
             break;
         case 4: // facing right
             gamePiece.template = [
-                [gamePiece.xPosition, gamePiece.yPosition - BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
-                [gamePiece.xPosition, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
-                [gamePiece.xPosition, gamePiece.yPosition + BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
-                [gamePiece.xPosition + BASE_UNIT_SIZE, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE]
+                [gamePiece.xPosition, gamePiece.yPosition - baseUnitSize],
+                [gamePiece.xPosition, gamePiece.yPosition],
+                [gamePiece.xPosition, gamePiece.yPosition + baseUnitSize],
+                [gamePiece.xPosition + baseUnitSize, gamePiece.yPosition]
             ]
             gamePiece.leftBoundary = 0;
-            gamePiece.rightBoundary = 2 * BASE_UNIT_SIZE;
+            gamePiece.rightBoundary = 2 * baseUnitSize;
             break;
         default: // error
             console.log("T Tetromino orientation error");
@@ -492,43 +539,43 @@ function selectJTetromino(orientation) {
     switch(orientation) {
         case 1: // facing left
             gamePiece.template = [
-                [gamePiece.xPosition - BASE_UNIT_SIZE, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
-                [gamePiece.xPosition, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
-                [gamePiece.xPosition + BASE_UNIT_SIZE, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
-                [gamePiece.xPosition + BASE_UNIT_SIZE, gamePiece.yPosition + BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE]
+                [gamePiece.xPosition - baseUnitSize, gamePiece.yPosition],
+                [gamePiece.xPosition, gamePiece.yPosition],
+                [gamePiece.xPosition + baseUnitSize, gamePiece.yPosition],
+                [gamePiece.xPosition + baseUnitSize, gamePiece.yPosition + baseUnitSize]
             ]
-            gamePiece.leftBoundary = - BASE_UNIT_SIZE;
-            gamePiece.rightBoundary = 2 * BASE_UNIT_SIZE;
+            gamePiece.leftBoundary = - baseUnitSize;
+            gamePiece.rightBoundary = 2 * baseUnitSize;
             break;
         case 2: // facing up
             gamePiece.template = [
-                [gamePiece.xPosition, gamePiece.yPosition - BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
-                [gamePiece.xPosition, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
-                [gamePiece.xPosition, gamePiece.yPosition + BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
-                [gamePiece.xPosition - BASE_UNIT_SIZE, gamePiece.yPosition + BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE]
+                [gamePiece.xPosition, gamePiece.yPosition - baseUnitSize],
+                [gamePiece.xPosition, gamePiece.yPosition],
+                [gamePiece.xPosition, gamePiece.yPosition + baseUnitSize],
+                [gamePiece.xPosition - baseUnitSize, gamePiece.yPosition + baseUnitSize]
             ]
-            gamePiece.leftBoundary = - BASE_UNIT_SIZE;
-            gamePiece.rightBoundary = BASE_UNIT_SIZE;
+            gamePiece.leftBoundary = - baseUnitSize;
+            gamePiece.rightBoundary = baseUnitSize;
             break;
         case 3: // facing right
             gamePiece.template = [
-                [gamePiece.xPosition - BASE_UNIT_SIZE, gamePiece.yPosition - BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
-                [gamePiece.xPosition - BASE_UNIT_SIZE, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
-                [gamePiece.xPosition, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
-                [gamePiece.xPosition + BASE_UNIT_SIZE, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE]
+                [gamePiece.xPosition - baseUnitSize, gamePiece.yPosition - baseUnitSize],
+                [gamePiece.xPosition - baseUnitSize, gamePiece.yPosition],
+                [gamePiece.xPosition, gamePiece.yPosition],
+                [gamePiece.xPosition + baseUnitSize, gamePiece.yPosition]
             ]
-            gamePiece.leftBoundary = - BASE_UNIT_SIZE;
-            gamePiece.rightBoundary = 2 * BASE_UNIT_SIZE;
+            gamePiece.leftBoundary = - baseUnitSize;
+            gamePiece.rightBoundary = 2 * baseUnitSize;
             break;
         case 4: // facing down
             gamePiece.template = [
-                [gamePiece.xPosition, gamePiece.yPosition - BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
-                [gamePiece.xPosition + BASE_UNIT_SIZE, gamePiece.yPosition - BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
-                [gamePiece.xPosition, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
-                [gamePiece.xPosition, gamePiece.yPosition + BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE]
+                [gamePiece.xPosition, gamePiece.yPosition - baseUnitSize],
+                [gamePiece.xPosition + baseUnitSize, gamePiece.yPosition - baseUnitSize],
+                [gamePiece.xPosition, gamePiece.yPosition],
+                [gamePiece.xPosition, gamePiece.yPosition + baseUnitSize]
             ]
             gamePiece.leftBoundary = 0;
-            gamePiece.rightBoundary = 2 * BASE_UNIT_SIZE;
+            gamePiece.rightBoundary = 2 * baseUnitSize;
             break;
         default: // error
             console.log("J Tetromino orientation error");
@@ -539,43 +586,43 @@ function selectLTetromino(orientation) {
     switch(orientation) {
         case 1: // facing right
             gamePiece.template = [
-                [gamePiece.xPosition - BASE_UNIT_SIZE, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
-                [gamePiece.xPosition, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
-                [gamePiece.xPosition + BASE_UNIT_SIZE, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
-                [gamePiece.xPosition - BASE_UNIT_SIZE, gamePiece.yPosition + BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE]
+                [gamePiece.xPosition - baseUnitSize, gamePiece.yPosition],
+                [gamePiece.xPosition, gamePiece.yPosition],
+                [gamePiece.xPosition + baseUnitSize, gamePiece.yPosition],
+                [gamePiece.xPosition - baseUnitSize, gamePiece.yPosition + baseUnitSize]
             ]
-            gamePiece.leftBoundary = - BASE_UNIT_SIZE;
-            gamePiece.rightBoundary = 2 * BASE_UNIT_SIZE;
+            gamePiece.leftBoundary = - baseUnitSize;
+            gamePiece.rightBoundary = 2 * baseUnitSize;
             break;
         case 2: // facing down
             gamePiece.template = [
-                [gamePiece.xPosition - BASE_UNIT_SIZE, gamePiece.yPosition - BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
-                [gamePiece.xPosition, gamePiece.yPosition - BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
-                [gamePiece.xPosition, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
-                [gamePiece.xPosition, gamePiece.yPosition + BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE]
+                [gamePiece.xPosition - baseUnitSize, gamePiece.yPosition - baseUnitSize],
+                [gamePiece.xPosition, gamePiece.yPosition - baseUnitSize],
+                [gamePiece.xPosition, gamePiece.yPosition],
+                [gamePiece.xPosition, gamePiece.yPosition + baseUnitSize]
             ]
-            gamePiece.leftBoundary = - BASE_UNIT_SIZE;
-            gamePiece.rightBoundary = BASE_UNIT_SIZE;
+            gamePiece.leftBoundary = - baseUnitSize;
+            gamePiece.rightBoundary = baseUnitSize;
             break;
         case 3: // facing left
             gamePiece.template = [
-                [gamePiece.xPosition - BASE_UNIT_SIZE, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
-                [gamePiece.xPosition, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
-                [gamePiece.xPosition + BASE_UNIT_SIZE, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
-                [gamePiece.xPosition + BASE_UNIT_SIZE, gamePiece.yPosition - BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE]
+                [gamePiece.xPosition - baseUnitSize, gamePiece.yPosition],
+                [gamePiece.xPosition, gamePiece.yPosition],
+                [gamePiece.xPosition + baseUnitSize, gamePiece.yPosition],
+                [gamePiece.xPosition + baseUnitSize, gamePiece.yPosition - baseUnitSize]
             ]
-            gamePiece.leftBoundary = - BASE_UNIT_SIZE;
-            gamePiece.rightBoundary = 2 * BASE_UNIT_SIZE;
+            gamePiece.leftBoundary = - baseUnitSize;
+            gamePiece.rightBoundary = 2 * baseUnitSize;
             break;
         case 4: // facing up
             gamePiece.template = [
-                [gamePiece.xPosition, gamePiece.yPosition - BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
-                [gamePiece.xPosition, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
-                [gamePiece.xPosition, gamePiece.yPosition + BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
-                [gamePiece.xPosition + BASE_UNIT_SIZE, gamePiece.yPosition + BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE]
+                [gamePiece.xPosition, gamePiece.yPosition - baseUnitSize],
+                [gamePiece.xPosition, gamePiece.yPosition],
+                [gamePiece.xPosition, gamePiece.yPosition + baseUnitSize],
+                [gamePiece.xPosition + baseUnitSize, gamePiece.yPosition + baseUnitSize]
             ]
             gamePiece.leftBoundary = 0;
-            gamePiece.rightBoundary = 2 * BASE_UNIT_SIZE;
+            gamePiece.rightBoundary = 2 * baseUnitSize;
             break;
         default: // error
             console.log("L Tetromino orientation error");
@@ -587,24 +634,24 @@ function selectSTetromino(orientation) {
         case 1: // vertical
         case 3: // vertical
             gamePiece.template = [
-                [gamePiece.xPosition, gamePiece.yPosition - BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
-                [gamePiece.xPosition, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
-                [gamePiece.xPosition + BASE_UNIT_SIZE, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
-                [gamePiece.xPosition + BASE_UNIT_SIZE, gamePiece.yPosition + BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE]
+                [gamePiece.xPosition, gamePiece.yPosition - baseUnitSize],
+                [gamePiece.xPosition, gamePiece.yPosition],
+                [gamePiece.xPosition + baseUnitSize, gamePiece.yPosition],
+                [gamePiece.xPosition + baseUnitSize, gamePiece.yPosition + baseUnitSize]
             ]
             gamePiece.leftBoundary = 0;
-            gamePiece.rightBoundary = 2 * BASE_UNIT_SIZE;
+            gamePiece.rightBoundary = 2 * baseUnitSize;
             break;
         case 2: // horizontal
         case 4: // horizontal
             gamePiece.template = [
-                [gamePiece.xPosition, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
-                [gamePiece.xPosition + BASE_UNIT_SIZE, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
-                [gamePiece.xPosition, gamePiece.yPosition + BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
-                [gamePiece.xPosition - BASE_UNIT_SIZE, gamePiece.yPosition + BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE]
+                [gamePiece.xPosition, gamePiece.yPosition],
+                [gamePiece.xPosition + baseUnitSize, gamePiece.yPosition],
+                [gamePiece.xPosition, gamePiece.yPosition + baseUnitSize],
+                [gamePiece.xPosition - baseUnitSize, gamePiece.yPosition + baseUnitSize]
             ]
-            gamePiece.leftBoundary = - BASE_UNIT_SIZE;
-            gamePiece.rightBoundary = 2 * BASE_UNIT_SIZE;
+            gamePiece.leftBoundary = - baseUnitSize;
+            gamePiece.rightBoundary = 2 * baseUnitSize;
             break;
         default: // error
             console.log("S Tetromino orientation error");
@@ -616,24 +663,24 @@ function selectZTetromino(orientation) {
         case 1: // horizontal
         case 3: // horizontal
             gamePiece.template = [
-                [gamePiece.xPosition - BASE_UNIT_SIZE, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
-                [gamePiece.xPosition, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
-                [gamePiece.xPosition, gamePiece.yPosition + BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
-                [gamePiece.xPosition + BASE_UNIT_SIZE, gamePiece.yPosition + BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE]
+                [gamePiece.xPosition - baseUnitSize, gamePiece.yPosition],
+                [gamePiece.xPosition, gamePiece.yPosition],
+                [gamePiece.xPosition, gamePiece.yPosition + baseUnitSize],
+                [gamePiece.xPosition + baseUnitSize, gamePiece.yPosition + baseUnitSize]
             ]
-            gamePiece.leftBoundary = - BASE_UNIT_SIZE;
-            gamePiece.rightBoundary = 2 * BASE_UNIT_SIZE;
+            gamePiece.leftBoundary = - baseUnitSize;
+            gamePiece.rightBoundary = 2 * baseUnitSize;
             break;
         case 2: // vertical
         case 4: // vertical
             gamePiece.template = [
-                [gamePiece.xPosition, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
-                [gamePiece.xPosition + BASE_UNIT_SIZE, gamePiece.yPosition, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
-                [gamePiece.xPosition + BASE_UNIT_SIZE, gamePiece.yPosition - BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE],
-                [gamePiece.xPosition, gamePiece.yPosition + BASE_UNIT_SIZE, BASE_UNIT_SIZE, BASE_UNIT_SIZE]
+                [gamePiece.xPosition, gamePiece.yPosition],
+                [gamePiece.xPosition + baseUnitSize, gamePiece.yPosition],
+                [gamePiece.xPosition + baseUnitSize, gamePiece.yPosition - baseUnitSize],
+                [gamePiece.xPosition, gamePiece.yPosition + baseUnitSize]
             ]
             gamePiece.leftBoundary = 0;
-            gamePiece.rightBoundary = 2 * BASE_UNIT_SIZE;
+            gamePiece.rightBoundary = 2 * baseUnitSize;
             break;
         default: // error
             console.log("Z Tetromino orientation error");

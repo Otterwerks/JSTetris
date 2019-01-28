@@ -9,7 +9,7 @@ const FPS = 30; // Frames per second
 const TETROMINOS = ["I", "O", "T", "S", "Z", "J", "L"];
 const DEBUG = false; // Enable testing functionality (read: cheats)
 
-// Make canvas size scale with piece size, all functionality retained across all gameboard sizes as well
+// Make canvas size scale with piece size, all functionality retained across non standard gameboard sizes as well
 var width = 10;
 var height = 20;
 canvas.width = baseUnitSize * width;
@@ -36,7 +36,7 @@ var gamePiece = {
 // The future playable piece, declared as object literal with placeholder attributes
 var futurePiece = {
     xPosition : canvas.width - (3 * baseUnitSize),
-    yPosition : 2 * baseUnitSize,
+    yPosition : baseUnitSize + (baseUnitSize / 2),
     orientation : 1,
     type : "I",
     color : "black",
@@ -49,10 +49,31 @@ var futurePiece = {
     ]
 };
 
+// Render background game grid
+function drawGrid() {
+    for (i = 0; i <= canvas.width; i += baseUnitSize) {
+        context.beginPath();
+        context.moveTo(i, 0);
+        context.lineTo(i, canvas.height);
+        context.lineWidth = baseUnitSize / 20;
+        context.strokeStyle = gridColor;
+        context.stroke();
+    }
+    for (i = 0; i <= canvas.height; i += baseUnitSize) {
+        context.beginPath();
+        context.moveTo(0, i);
+        context.lineTo(canvas.width, i);
+        context.lineWidth = baseUnitSize / 20;
+        context.strokeStyle = gridColor;
+        context.stroke();
+    }
+}
+
 
 // Colors and Themes
 //--------------------------------------------------------------------------------
 var colors = ["red", "green", "blue", "purple", "yellow", "orange", "pink"];
+var gridColor = "ccc";
 
 // const THEME_99 = ["", "", "", "", ""]; copy paste for adding new theme
 
@@ -93,6 +114,7 @@ window.onload = function() {
             gamePiece.updateTemplate(); // required because gamePiece.template does not dynamically update with xPosition and yPosition
             detectCollision();
             gravity();
+            drawGrid();
             drawGamePiece();
             drawNextPiece();
             drawFallenPieces();
@@ -128,6 +150,48 @@ function drawGameOver() {
     context.fillText("Refresh page to play again", (canvas.width / 2), (canvas.height / 3));
 }
 
+// Animation of blocks up
+function animateBlocksUp() {
+    let t = 0;
+    for (i = canvas.height - baseUnitSize; i >= 0; i -= baseUnitSize){
+        for (j = canvas.width - baseUnitSize; j >= 0; j -= baseUnitSize) {
+            setTimeout(upCallBack(j, i), t);
+            t += 10;
+        }
+    }
+    animateBlocksDown(t);
+}
+
+// Callback funtion to pass coordinates for animateBlocksUp();
+function upCallBack(j, i){
+    return function() {
+        context.beginPath();
+        context.fillStyle = colors[Math.floor(Math.random() * colors.length)];
+        context.lineWidth = baseUnitSize / 10;
+        context.strokeStyle = "black";
+        context.rect(j, i, baseUnitSize, baseUnitSize);
+        context.fill();
+        context.stroke();
+    }
+}
+
+// Animation of blocks down
+function animateBlocksDown(t) {
+    for (i = 0; i <= canvas.height; i += baseUnitSize){
+        for (j = 0; j <= canvas.width; j += baseUnitSize) {
+            setTimeout(downCallBack(j, i), t);
+            t += 10;
+        }
+    }
+}
+
+// Callback funtion to pass coordinates for animateBlocksUp();
+function downCallBack(j, i){
+    return function() {
+        context.clearRect(j, i, baseUnitSize, baseUnitSize);
+    }
+}
+
 // Assign points for clearing rows, bonus points for clearning more than 1 row at once
 function givePoints(rowsCleared) {
     if (rowsCleared == 1) {
@@ -144,6 +208,8 @@ function checkLoss() {
         if (gamePiece.template[i][1] <= 0) {
             // Game over!
             gameState = 0;
+            animateBlocksUp();
+            return;
         }
     }
 }
@@ -301,7 +367,7 @@ function detectCompleteRows() {
     let totalPossible = canvas.width / baseUnitSize;
     let totalBlockCount = 0;
     for (let i = 0; i < canvas.height; i += baseUnitSize) { // start at the top and go down row by row
-        totalBlockCount = 0;
+        totalBlockCount = 0; // reset block count before moving to next row
         for (let j = 0; j < canvas.width; j += baseUnitSize) { // check each row from left to right
             for (let k = 0; k < fallenPieces.length; k++) { // look at each fallen block
                 if (fallenPieces[k][1] == i && 
@@ -494,7 +560,7 @@ function keyDownHandler(event) {
             // L key
             gamePiece.type = "L";
         }
-        // RDFG movement pad without boundaries
+        // RDFG movement pad without boundary checks
         else if (event.keyCode == 68) {
             // D key
             gamePiece.xPosition -= baseUnitSize;
@@ -554,7 +620,6 @@ function selectGamePiece(target, orientation, type) {
     }
 }
 
-
 // "I" Tetromino
 function selectITetromino(target, orientation) {
     switch(orientation) {
@@ -584,6 +649,7 @@ function selectITetromino(target, orientation) {
             console.log("I Tetromino orientation error")
     }
 }
+
 // "O" Tetromino
 function selectOTetromino(target, orientation) {
     switch(orientation) {
@@ -604,6 +670,7 @@ function selectOTetromino(target, orientation) {
             console.log("O Tetromino orientation error");
     }   
 }
+
 // "T" Tetromino
 function selectTTetromino(target, orientation) {
     switch(orientation) {
@@ -651,6 +718,7 @@ function selectTTetromino(target, orientation) {
             console.log("T Tetromino orientation error");
     }
 }
+
 // "J" Tetromino
 function selectJTetromino(target, orientation) {
     switch(orientation) {
@@ -698,6 +766,7 @@ function selectJTetromino(target, orientation) {
             console.log("J Tetromino orientation error");
     }
 }
+
 // "L" Tetromino
 function selectLTetromino(target, orientation) {
     switch(orientation) {
@@ -745,6 +814,7 @@ function selectLTetromino(target, orientation) {
             console.log("L Tetromino orientation error");
     }
 }
+
 // "S" Tetromino
 function selectSTetromino(target, orientation) {
     switch(orientation) {
@@ -774,6 +844,7 @@ function selectSTetromino(target, orientation) {
             console.log("S Tetromino orientation error");
     }
 }
+
 // "Z" Tetromino
 function selectZTetromino(target, orientation) {
     switch(orientation) {

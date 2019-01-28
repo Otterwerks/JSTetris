@@ -79,16 +79,16 @@ var gridColor = "ccc";
 
 // Array to feed randomTheme();
 themes = [
-    ["ED6A5A", "F4F1BB", "9BC1BC", "7D7C84", "E6EBE0"], // theme 1
-    ["FBF5F3", "522B47", "7B0828", "7D7C84", "0F0E0E"], // theme 2
-    ["FF715B", "522B47", "FFFFFF", "7D7C84", "1EA896"], // theme 3
-    ["F4E76E", "F7FE72", "8FF7A7", "7D7C84", "51BBFE"], // theme 4
-    ["FFEEF2", "FFE4F3", "FFC8FB", "7D7C84", "FF92C2"], // theme 5
-    ["3D5A80", "98C1D9", "E0FBFC", "EE6C4D", "293241"], // theme 6
-    ["D8A47F", "EF8354", "EE4B6A", "DF3B57", "0F7173"], // theme 7
-    ["725752", "878E88", "96C0B7", "D4DFC7", "FEF6C9"], // theme 8
-    ["DBF4AD", "A9E190", "CDC776", "A5AA52", "767522"], // theme 9
-    ["EAF2E3", "61E8E1", "F25757", "F2E863", "F2CD60"], // theme 10
+    ["#ED6A5A", "#F4F1BB", "#9BC1BC", "#7D7C84", "#E6EBE0"], // theme 1
+    ["#FBF5F3", "#522B47", "#7B0828", "#7D7C84", "#0F0E0E"], // theme 2
+    ["#FF715B", "#522B47", "#FFFFFF", "#7D7C84", "#1EA896"], // theme 3
+    ["#F4E76E", "#F7FE72", "#8FF7A7", "#7D7C84", "#51BBFE"], // theme 4
+    ["#FFEEF2", "#FFE4F3", "#FFC8FB", "#7D7C84", "#FF92C2"], // theme 5
+    ["#3D5A80", "#98C1D9", "#E0FBFC", "#EE6C4D", "#293241"], // theme 6
+    ["#D8A47F", "#EF8354", "#EE4B6A", "#DF3B57", "#0F7173"], // theme 7
+    ["#725752", "#878E88", "#96C0B7", "#D4DFC7", "#FEF6C9"], // theme 8
+    ["#DBF4AD", "#A9E190", "#CDC776", "#A5AA52", "#767522"], // theme 9
+    ["#EAF2E3", "#61E8E1", "#F25757", "#F2E863", "#F2CD60"], // theme 10
 ];
 
 // Load random theme
@@ -131,7 +131,7 @@ window.onload = function() {
 //---------------------------------------------------------------------------------
 
 // Player stats and scorekeeping
-var playerScore = 0
+var playerScore = 0;
 
 // Render player stats and score
 function drawStats() {
@@ -185,7 +185,7 @@ function animateBlocksDown(t) {
     }
 }
 
-// Callback funtion to pass coordinates for animateBlocksUp();
+// Callback funtion to pass coordinates for animateBlocksDown();
 function downCallBack(j, i){
     return function() {
         context.clearRect(j, i, baseUnitSize, baseUnitSize);

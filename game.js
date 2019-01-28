@@ -4,7 +4,7 @@
 var canvas = document.getElementById("gameCanvas");
 var context = canvas.getContext("2d");
 
-var baseUnitSize = 40; // Tetromino block size in pixels, this value scales everything
+var baseUnitSize = 30; // Tetromino block size in pixels, this value scales everything
 const FPS = 30; // Frames per second
 const TETROMINOS = ["I", "O", "T", "S", "Z", "J", "L"];
 const DEBUG = false; // Enable testing functionality (read: cheats)

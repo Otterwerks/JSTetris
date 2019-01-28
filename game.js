@@ -73,7 +73,7 @@ function drawGrid() {
 // Colors and Themes
 //--------------------------------------------------------------------------------
 var colors = ["red", "green", "blue", "purple", "yellow", "orange", "pink"];
-var gridColor = "ccc";
+var gridColor = "#ccc";
 
 // const THEME_99 = ["", "", "", "", ""]; copy paste for adding new theme
 
@@ -136,7 +136,7 @@ var playerScore = 0;
 // Render player stats and score
 function drawStats() {
     context.font = (baseUnitSize / 2) + "px Monaco";
-    context.fillStyle = "555";
+    context.fillStyle = "#555";
     context.textAlign = "left";
     context.fillText("Score: " + playerScore, baseUnitSize, baseUnitSize);
 }
@@ -144,7 +144,7 @@ function drawStats() {
 // Render game over screen
 function drawGameOver() {
     context.font = (baseUnitSize / 2) + "px Monaco";
-    context.fillStyle = "555";
+    context.fillStyle = "#555";
     context.textAlign = "center";
     context.fillText("GAME OVER", (canvas.width / 2), (canvas.height / 4));
     context.fillText("Refresh page to play again", (canvas.width / 2), (canvas.height / 3));

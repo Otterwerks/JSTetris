@@ -565,7 +565,7 @@ function moveGamePiece(direction) {
 //------------------------------------------------------------------------------
 
 document.addEventListener('keydown', keyDownHandler, false);
-document.addEventListener("touchstart", touchHandler);
+document.addEventListener("touchstart", touchHandler, false);
 
 function touchHandler(event) {
     if (event.touches) {

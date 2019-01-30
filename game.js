@@ -317,6 +317,7 @@ function willCollide() {
                 fallSpeed /= 10;
             }
             allowDown = false;
+            return;
         }
         for (let j = 0; j < fallenPieces.length; j++) {
             if (gamePiece.template[i][0] == fallenPieces[j][0] && 
@@ -326,9 +327,11 @@ function willCollide() {
                         fallSpeed /= 10;
                     }
                     allowDown = false;
+                    return;
             }
         }
     }
+    allowDown = true;
 }
 
 // Collision detection
@@ -562,6 +565,28 @@ function moveGamePiece(direction) {
 //------------------------------------------------------------------------------
 
 document.addEventListener('keydown', keyDownHandler, false);
+document.addEventListener("touchstart", touchHandler);
+
+function touchHandler(event) {
+    if (event.touches) {
+        if (event.touches[0].pageY > canvas.height * 3/4) {
+            keyDownHandler(32);
+        }
+        else if (event.touches[0].pageY < canvas.height / 4) {
+            keyDownHandler(38);
+        }
+        else if (event.touches[0].pageY > canvas.height / 4 &&
+                event.touches[0].pageY < canvas.height * 3/4 &&
+                event.touches[0].pageX < canvas.width / 2) {
+                    keyDownHandler(37);
+                }
+        else if (event.touches[0].pageY > canvas.height / 4 &&
+                event.touches[0].pageY < canvas.height * 3/4 &&
+                event.touches[0].pageX > canvas.width / 2) {
+                    keyDownHandler(39);
+                }
+    }
+}
 
 function keyDownHandler(event) {
     if (event.keyCode == 39) {

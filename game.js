@@ -320,7 +320,8 @@ function willCollide() {
         }
         for (let j = 0; j < fallenPieces.length; j++) {
             if (gamePiece.template[i][0] == fallenPieces[j][0] && 
-                gamePiece.template[i][1] + 2 * baseUnitSize >= fallenPieces[j][1]) {
+                gamePiece.template[i][1] + 2 * baseUnitSize >= fallenPieces[j][1] &&
+                gamePiece.template[i][1] < fallenPieces[j][1]) {
                     if (fallSpeed >= 10) {
                         fallSpeed /= 10;
                     }
@@ -346,7 +347,8 @@ function detectCollision() {
         }
         for (let j = 0; j < fallenPieces.length; j++) {
             if (gamePiece.template[i][0] == fallenPieces[j][0] && 
-                gamePiece.template[i][1] + baseUnitSize + baseUnitSize / 10 >= fallenPieces[j][1]) {
+                gamePiece.template[i][1] + baseUnitSize + baseUnitSize / 10 >= fallenPieces[j][1] &&
+                gamePiece.template[i][1] < fallenPieces[j][1] ) {
                     alignGamePiece(gamePiece.template[i][1] + baseUnitSize, fallenPieces[j][1]);
                     checkLoss();
                     saveToFallen();
@@ -382,6 +384,27 @@ function detectLateralCollisionRight() {
         }
     }
     return false;
+}
+
+function allowRotation(tryingToRotateTo) {
+    let rotationCheckPiece = {};
+    rotationCheckPiece.xPosition = gamePiece.xPosition;
+    rotationCheckPiece.yPosition = gamePiece.yPosition;
+    selectGamePiece(rotationCheckPiece, tryingToRotateTo, gamePiece.type);
+    //check for canvas collision
+    for (let i = 0; i < 4; i++) {
+        if (rotationCheckPiece.template[i][1] > canvas.height) {
+            return false;
+        }
+        for (let j = 0; j < fallenPieces.length; j++) {
+            if (rotationCheckPiece.template[i][0] == fallenPieces[j][0] &&
+                rotationCheckPiece.template[i][1] >= fallenPieces[j][1] &&
+                rotationCheckPiece.template[i][1] <= fallenPieces[j][1] + baseUnitSize) {
+                return false;
+            }
+        }
+    }
+    return true;
 }
 
 // Check for full rows by top left corner of block, recursively
@@ -471,12 +494,19 @@ function saveToFallen() {
 
 // Set piece orientation
 function rotateGamePiece(direction) {
+    let tryingToRotateTo = 0;
     if (direction == "CLOCKWISE"){
         if (gamePiece.orientation == 1 || gamePiece.orientation == 2 || gamePiece.orientation == 3) {
-            gamePiece.orientation ++;
+            tryingToRotateTo = gamePiece.orientation + 1;
+            if (allowRotation(tryingToRotateTo) == true) {
+                gamePiece.orientation ++;
+            }
         }
         else if (gamePiece.orientation == 4) {
-            gamePiece.orientation = 1;
+            tryingToRotateTo = 1;
+            if (allowRotation(tryingToRotateTo) == true) {
+                gamePiece.orientation = 1;
+            }
         }
         else {
             console.log("Unknown clockwise rotation: " + gamePiece.orientation);
@@ -484,10 +514,16 @@ function rotateGamePiece(direction) {
     }
     else if (direction == "COUNTERCLOCKWISE") {
         if (gamePiece.orientation == 2 || gamePiece.orientation == 3 || gamePiece.orientation == 4) {
-            gamePiece.orientation --;
+            tryingToRotateTo = gamePiece.orientation - 1;
+            if (allowRotation(tryingToRotateTo) == true) {
+                gamePiece.orientation --;
+            }
         }
         else if (gamePiece.orientation == 1) {
-            gamePiece.orientation = 4;
+            tryingToRotateTo = 4;
+            if (allowRotation(tryingToRotateTo) == true) {
+                gamePiece.orientation = 4;
+            }
         }
         else {
             console.log("Unknown counterclockwise rotation: " + gamePiece.orientation);

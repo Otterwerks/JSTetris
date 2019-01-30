@@ -570,6 +570,7 @@ document.addEventListener("keydown", keyDownHandler, false);
 document.addEventListener("touchstart", touchHandler, false);
 
 function touchHandler(event) {
+    event.preventDefault();
     if (event.touches) {
         if (event.touches[0].pageY > canvas.height * 3/4) {
             fallSpeed = 40;

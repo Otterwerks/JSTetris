@@ -358,6 +358,32 @@ function detectCollision() {
     }  
 }
 
+function detectLateralCollisionLeft() {
+    for (let i = 0; i < 4; i++) {
+        for (let j = 0; j < fallenPieces.length; j++) {
+            if (gamePiece.template[i][0] == fallenPieces[j][0] + baseUnitSize &&
+                gamePiece.template[i][1] >= fallenPieces[j][1] &&
+                gamePiece.template[i][1] < fallenPieces[j][1] + baseUnitSize) {
+                    return true;
+                }
+        }
+    }
+    return false;
+}
+
+function detectLateralCollisionRight() {
+    for (let i = 0; i < 4; i++) {
+        for (let j = 0; j < fallenPieces.length; j++) {
+            if (gamePiece.template[i][0] == fallenPieces[j][0] - baseUnitSize &&
+                gamePiece.template[i][1] >= fallenPieces[j][1] &&
+                gamePiece.template[i][1] < fallenPieces[j][1] + baseUnitSize) {
+                    return true;
+                }
+        }
+    }
+    return false;
+}
+
 // Check for full rows by top left corner of block, recursively
 
 var rowsCleared = 0;
@@ -475,12 +501,12 @@ function rotateGamePiece(direction) {
 // Move piece
 function moveGamePiece(direction) {
     if (direction == "LEFT") {
-        if (gamePiece.xPosition + gamePiece.leftBoundary > 0) { 
+        if (gamePiece.xPosition + gamePiece.leftBoundary > 0 && detectLateralCollisionLeft() == false) { 
             gamePiece.xPosition -= baseUnitSize;
         }
     }
     else if (direction == "RIGHT") {
-        if (gamePiece.xPosition + gamePiece.rightBoundary < canvas.width) {
+        if (gamePiece.xPosition + gamePiece.rightBoundary < canvas.width && detectLateralCollisionRight() == false) {
             gamePiece.xPosition += baseUnitSize;
         }
     }

@@ -14,6 +14,8 @@ var width = 10;
 var height = 20;
 canvas.width = baseUnitSize * width;
 canvas.height = baseUnitSize * height;
+let canvasLeftSide = canvas.getBoundingClientRect().left;
+let canvasRightSide = canvas.getBoundingClientRect().right;
 
 // The playable piece, declared as object literal with placeholder attributes
 var gamePiece = {
@@ -564,7 +566,7 @@ function moveGamePiece(direction) {
 // Keyboard event listeners and friends
 //------------------------------------------------------------------------------
 
-document.addEventListener('keydown', keyDownHandler, false);
+document.addEventListener("keydown", keyDownHandler, false);
 document.addEventListener("touchstart", touchHandler, false);
 
 function touchHandler(event) {
@@ -577,12 +579,12 @@ function touchHandler(event) {
         }
         else if (event.touches[0].pageY > canvas.height / 4 &&
                 event.touches[0].pageY < canvas.height * 3/4 &&
-                event.touches[0].pageX < canvas.width / 2) {
+                event.touches[0].pageX < canvasLeftSide + canvas.width / 2) {
                     moveGamePiece("LEFT");
                 }
         else if (event.touches[0].pageY > canvas.height / 4 &&
                 event.touches[0].pageY < canvas.height * 3/4 &&
-                event.touches[0].pageX > canvas.width / 2) {
+                event.touches[0].pageX > canvasLeftSide + canvas.width / 2) {
                     moveGamePiece("RIGHT");
                 }
     }

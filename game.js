@@ -16,10 +16,6 @@ canvas.height = baseUnitSize * height;
 let canvasLeftSide = canvas.getBoundingClientRect().left;
 let canvasRightSide = canvas.getBoundingClientRect().right;
 
-if (isMobileDevice() == true) {
-    baseUnitSize = Math.floor(window.screen.availWidth / 12);
-}
-
 // The playable piece, declared as object literal with placeholder attributes
 var gamePiece = {
     xPosition : canvas.width / 2,

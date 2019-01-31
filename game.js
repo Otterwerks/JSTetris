@@ -1,6 +1,5 @@
 // Initialization
 //--------------------------------------------------------------------------------
-
 var canvas = document.getElementById("gameCanvas");
 var context = canvas.getContext("2d");
 
@@ -11,11 +10,15 @@ const DEBUG = false; // Enable testing functionality (read: cheats)
 
 // Make canvas size scale with piece size, all functionality retained across non standard gameboard sizes as well
 var width = 10;
-var height = 20;
+var height = 30;
 canvas.width = baseUnitSize * width;
 canvas.height = baseUnitSize * height;
 let canvasLeftSide = canvas.getBoundingClientRect().left;
 let canvasRightSide = canvas.getBoundingClientRect().right;
+
+if (isMobileDevice() == true) {
+    baseUnitSize = Math.floor(window.screen.availWidth / 12);
+}
 
 // The playable piece, declared as object literal with placeholder attributes
 var gamePiece = {
@@ -568,32 +571,43 @@ function moveGamePiece(direction) {
 
 document.addEventListener("keydown", keyDownHandler, false);
 document.addEventListener("touchstart", touchStart, false);
-document.addEventListener("touchend", touchEnd, false); 
+document.addEventListener("touchmove", touchMove, false);
+document.addEventListener("touchend", touchEnd, false);
+
+var touchStartX = 0;
+var touchStartY = 0;
 
 function touchStart(event) {
     event.preventDefault();
-    if (event.touches) {
-        if (event.touches[0].pageY > canvas.height * 3/4) {
-            fallSpeed = 40;
-        }
-        else if (event.touches[0].pageY < canvas.height / 4) {
-            rotateGamePiece("CLOCKWISE");
-        }
-        else if (event.touches[0].pageY > canvas.height / 4 &&
-                event.touches[0].pageY < canvas.height * 3/4 &&
-                event.touches[0].pageX < canvasLeftSide + canvas.width / 2) {
-                    moveGamePiece("LEFT");
-                }
-        else if (event.touches[0].pageY > canvas.height / 4 &&
-                event.touches[0].pageY < canvas.height * 3/4 &&
-                event.touches[0].pageX > canvasLeftSide + canvas.width / 2) {
-                    moveGamePiece("RIGHT");
-                }
+    touchStartX = event.touches[0].pageX;
+    touchStartY = event.touches[0].pageY;
+}
+
+function touchEnd(event) {
+    event.preventDefault();
+    let touchEndX = event.changedTouches[0].pageX;
+    let touchEndY = event.changedTouches[0].pageY;
+    if (touchEndY > touchStartY + 2 * baseUnitSize &&
+            touchEndY < touchStartY + 6 * baseUnitSize) {
+                moveGamePiece("DOWN");
+            }
+    else if (touchEndY > touchStartY + 6 * baseUnitSize) {
+        fallSpeed = 40;
+    }
+    else if (touchEndY < touchStartY - 2 * baseUnitSize) {
+        rotateGamePiece("COUNTERCLOCKWISE");
+    }
+    else if (touchEndX > touchStartX + baseUnitSize ) {
+        moveGamePiece("RIGHT");
+    }
+    else if (touchEndX < touchStartX - baseUnitSize) {
+        moveGamePiece("LEFT");
     }
 }
- function touchEnd(event) {
+
+function touchMove(event) {
      event.preventDefault();
- }
+}
 
 function keyDownHandler(event) {
     if (event.keyCode == 39) {
@@ -610,7 +624,7 @@ function keyDownHandler(event) {
     }
     else if (event.keyCode == 38) {
         // Up arrow
-        rotateGamePiece("CLOCKWISE");
+        rotateGamePiece("COUNTERCLOCKWISE");
     }
     else if (event.keyCode == 32) {
         // Spacebar

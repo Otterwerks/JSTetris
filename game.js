@@ -567,9 +567,10 @@ function moveGamePiece(direction) {
 //------------------------------------------------------------------------------
 
 document.addEventListener("keydown", keyDownHandler, false);
-document.addEventListener("touchstart", touchHandler, false);
+document.addEventListener("touchstart", touchStart, false);
+document.addEventListener("touchend", touchEnd, false); 
 
-function touchHandler(event) {
+function touchStart(event) {
     event.preventDefault();
     if (event.touches) {
         if (event.touches[0].pageY > canvas.height * 3/4) {
@@ -590,6 +591,9 @@ function touchHandler(event) {
                 }
     }
 }
+ function touchEnd(event) {
+     event.preventDefault();
+ }
 
 function keyDownHandler(event) {
     if (event.keyCode == 39) {

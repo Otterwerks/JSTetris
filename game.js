@@ -3,14 +3,14 @@
 var canvas = document.getElementById("gameCanvas");
 var context = canvas.getContext("2d");
 
-var baseUnitSize = 30; // Tetromino block size in pixels, this value scales everything
+var baseUnitSize = 40; // Tetromino block size in pixels, this value scales everything
 const FPS = 30; // Frames per second
 const TETROMINOS = ["I", "O", "T", "S", "Z", "J", "L"];
 const DEBUG = false; // Enable testing functionality (read: cheats)
 
 // Make canvas size scale with piece size, all functionality retained across non standard gameboard sizes as well
 var width = 10;
-var height = 30;
+var height = 20;
 canvas.width = baseUnitSize * width;
 canvas.height = baseUnitSize * height;
 let canvasLeftSide = canvas.getBoundingClientRect().left;

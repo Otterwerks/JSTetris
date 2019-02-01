@@ -148,6 +148,7 @@ function drawGameOver() {
     context.fillStyle = "#555";
     context.textAlign = "center";
     context.fillText("GAME OVER", (canvas.width / 2), (canvas.height / 4));
+    context.fillText(totalRowsCleared + " rows cleared.");
     context.fillText("Refresh page to play again", (canvas.width / 2), (canvas.height / 3));
 }
 
@@ -395,7 +396,6 @@ function allowRotation(tryingToRotateTo) {
     rotationCheckPiece.xPosition = gamePiece.xPosition;
     rotationCheckPiece.yPosition = gamePiece.yPosition;
     selectGamePiece(rotationCheckPiece, tryingToRotateTo, gamePiece.type);
-    //check for canvas collision
     for (let i = 0; i < 4; i++) {
         if (rotationCheckPiece.template[i][1] > canvas.height) {
             return false;
@@ -413,6 +413,7 @@ function allowRotation(tryingToRotateTo) {
 
 // Check for full rows by top left corner of block, recursively
 
+var totalRowsCleared = 0;
 var rowsCleared = 0;
 
 function detectCompleteRows() {
@@ -432,6 +433,7 @@ function detectCompleteRows() {
                 clearRow(i);
                 shiftRowsDown(i);
                 rowsCleared++;
+                totalRowsCleared++;
                 detectCompleteRows();
                 return;
             }
@@ -574,30 +576,33 @@ var touchStartX = 0;
 var touchStartY = 0;
 
 function touchStart(event) {
-    event.preventDefault();
     touchStartX = event.touches[0].pageX;
     touchStartY = event.touches[0].pageY;
 }
 
 function touchEnd(event) {
-    event.preventDefault();
     let touchEndX = event.changedTouches[0].pageX;
     let touchEndY = event.changedTouches[0].pageY;
     if (touchEndY > touchStartY + 2 * baseUnitSize &&
             touchEndY < touchStartY + 6 * baseUnitSize) {
                 moveGamePiece("DOWN");
+                event.preventDefault();
             }
     else if (touchEndY > touchStartY + 6 * baseUnitSize) {
         fallSpeed = 40;
+        event.preventDefault();
     }
     else if (touchEndY < touchStartY - 2 * baseUnitSize) {
         rotateGamePiece("COUNTERCLOCKWISE");
+        event.preventDefault();
     }
     else if (touchEndX > touchStartX + baseUnitSize ) {
         moveGamePiece("RIGHT");
+        event.preventDefault();
     }
     else if (touchEndX < touchStartX - baseUnitSize) {
         moveGamePiece("LEFT");
+        event.preventDefault();
     }
 }
 

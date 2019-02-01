@@ -148,8 +148,8 @@ function drawGameOver() {
     context.fillStyle = "#555";
     context.textAlign = "center";
     context.fillText("GAME OVER", (canvas.width / 2), (canvas.height / 4));
-    context.fillText(totalRowsCleared + " rows cleared.");
-    context.fillText("Refresh page to play again", (canvas.width / 2), (canvas.height / 3));
+    context.fillText(totalRowsCleared + " rows cleared.", (canvas.width / 2), (canvas.height / 4) + baseUnitSize);
+    context.fillText("Refresh page to play again", (canvas.width / 2), (canvas.height / 4) + 2 * baseUnitSize);
 }
 
 // Animation of blocks up
@@ -581,28 +581,34 @@ function touchStart(event) {
 }
 
 function touchEnd(event) {
+    event.preventDefault();
     let touchEndX = event.changedTouches[0].pageX;
     let touchEndY = event.changedTouches[0].pageY;
     if (touchEndY > touchStartY + 2 * baseUnitSize &&
             touchEndY < touchStartY + 6 * baseUnitSize) {
                 moveGamePiece("DOWN");
                 event.preventDefault();
+                return;
             }
     else if (touchEndY > touchStartY + 6 * baseUnitSize) {
         fallSpeed = 40;
         event.preventDefault();
+        return;
     }
     else if (touchEndY < touchStartY - 2 * baseUnitSize) {
         rotateGamePiece("COUNTERCLOCKWISE");
         event.preventDefault();
+        return;
     }
     else if (touchEndX > touchStartX + baseUnitSize ) {
         moveGamePiece("RIGHT");
-        event.preventDefault();
+        event.preventDefault;
+        return;
     }
     else if (touchEndX < touchStartX - baseUnitSize) {
         moveGamePiece("LEFT");
         event.preventDefault();
+        return;
     }
 }
 

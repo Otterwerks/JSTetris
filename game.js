@@ -8,7 +8,6 @@ const FPS = 30; // Frames per second
 const TETROMINOS = ["I", "O", "T", "S", "Z", "J", "L"];
 const DEBUG = false; // Enable testing functionality (read: cheats)
 
-// Make canvas size scale with piece size, all functionality retained across non standard gameboard sizes as well
 var width = 10;
 var height = 20;
 canvas.width = baseUnitSize * width;
@@ -16,7 +15,6 @@ canvas.height = baseUnitSize * height;
 let canvasLeftSide = canvas.getBoundingClientRect().left;
 let canvasRightSide = canvas.getBoundingClientRect().right;
 
-// The playable piece, declared as object literal with placeholder attributes
 var gamePiece = {
     xPosition : canvas.width / 2,
     yPosition : 0,
@@ -34,7 +32,6 @@ var gamePiece = {
     ]
 };
 
-// The future playable piece, declared as object literal with placeholder attributes
 var futurePiece = {
     xPosition : canvas.width - (3 * baseUnitSize),
     yPosition : baseUnitSize + (baseUnitSize / 2),
@@ -50,7 +47,6 @@ var futurePiece = {
     ]
 };
 
-// Render background game grid
 function drawGrid() {
     for (i = 0; i <= canvas.width; i += baseUnitSize) {
         context.beginPath();
@@ -78,7 +74,6 @@ var gridColor = "#ccc";
 
 // const THEME_99 = ["", "", "", "", ""]; copy paste for adding new theme
 
-// Array to feed randomTheme();
 themes = [
     ["#ED6A5A", "#F4F1BB", "#9BC1BC", "#7D7C84", "#E6EBE0"], // theme 1
     ["#FBF5F3", "#522B47", "#7B0828", "#7D7C84", "#0F0E0E"], // theme 2
@@ -92,7 +87,6 @@ themes = [
     ["#EAF2E3", "#61E8E1", "#F25757", "#F2E863", "#F2CD60"], // theme 10
 ];
 
-// Load random theme
 function randomTheme() {
     colors = themes[Math.floor(Math.random() * themes.length)];
 }
@@ -103,7 +97,6 @@ function randomTheme() {
 
 var gameState = 1;
 
-// Canvas rendering
 window.onload = function() {
     randomTheme();
     addToQueue(3);
@@ -124,6 +117,7 @@ window.onload = function() {
         else if (gameState == 0) {
             drawStats();
             drawGameOver();
+            drawLeaderboard();
         }
     }, 1000/FPS)
 }
@@ -131,10 +125,10 @@ window.onload = function() {
 // Scoring and loss conditions
 //---------------------------------------------------------------------------------
 
-// Player stats and scorekeeping
 var playerScore = 0;
+var playerName = "";
+var leaderboard = [];
 
-// Render player stats and score
 function drawStats() {
     context.font = (baseUnitSize / 2) + "px Monaco";
     context.fillStyle = "#555";
@@ -142,7 +136,16 @@ function drawStats() {
     context.fillText("Score: " + playerScore, baseUnitSize, baseUnitSize);
 }
 
-// Render game over screen
+function drawLeaderboard() {
+    buildLeaderboard();
+    for (let i = 0; i < leaderboard.length; i++) {
+        context.font = (baseUnitSize / 2) + "px Helvetica";
+        context.fillStyle = "CadetBlue";
+        context.textAlign = "center";
+        context.fillText((leaderboard[i].name + ": " + leaderboard[i].score), (canvas.width / 2), ((canvas.height / 2) + (i * baseUnitSize)));
+    }
+}
+
 function drawGameOver() {
     context.font = (baseUnitSize / 2) + "px Monaco";
     context.fillStyle = "#555";
@@ -152,7 +155,6 @@ function drawGameOver() {
     context.fillText("Refresh page to play again", (canvas.width / 2), (canvas.height / 4) + 2 * baseUnitSize);
 }
 
-// Animation of blocks up
 function animateBlocksUp() {
     let t = 0;
     for (i = canvas.height - baseUnitSize; i >= 0; i -= baseUnitSize){
@@ -164,7 +166,6 @@ function animateBlocksUp() {
     animateBlocksDown(t);
 }
 
-// Callback funtion to pass coordinates for animateBlocksUp();
 function upCallBack(j, i){
     return function() {
         context.beginPath();
@@ -177,7 +178,6 @@ function upCallBack(j, i){
     }
 }
 
-// Animation of blocks down
 function animateBlocksDown(t) {
     for (i = 0; i <= canvas.height; i += baseUnitSize){
         for (j = 0; j <= canvas.width; j += baseUnitSize) {
@@ -185,16 +185,15 @@ function animateBlocksDown(t) {
             t += 10;
         }
     }
+    setTimeout(drawLeaderboard(), t);
 }
 
-// Callback funtion to pass coordinates for animateBlocksDown();
 function downCallBack(j, i){
     return function() {
         context.clearRect(j, i, baseUnitSize, baseUnitSize);
     }
 }
 
-// Assign points for clearing rows, bonus points for clearning more than 1 row at once
 function givePoints(rowsCleared) {
     if (rowsCleared == 1) {
         playerScore += 10;
@@ -204,12 +203,12 @@ function givePoints(rowsCleared) {
     }
 }
 
-// Loss condition
 function checkLoss() {
     for (i = 0; i < 4; i++) {
         if (gamePiece.template[i][1] <= 0) {
             // Game over!
             gameState = 0;
+            getLeaderboard();
             animateBlocksUp();
             return;
         }
@@ -220,10 +219,8 @@ function checkLoss() {
 // Functionality
 //---------------------------------------------------------------------------------
 
-// The queue for pieces to be played
 var futurePieces = [];
 
-// Populate queue with x pieces
 function addToQueue(numberOfPieces) {
     let piece = {};
     for (let i = 0; i < numberOfPieces; i++) {
@@ -235,7 +232,6 @@ function addToQueue(numberOfPieces) {
     }
 }
 
-// Load attributes from queue into next piece
 function setFuturePiece() {
     futurePiece.orientation = futurePieces[0].orientation;
     futurePiece.type = futurePieces[0].type;
@@ -246,14 +242,12 @@ function setFuturePiece() {
 
 var fallSpeed = 1; // base units per second
 
-// Make game piece fall down
 function gravity() {
     if (gamePiece.yPosition < canvas.height) {
         gamePiece.yPosition += fallSpeed * baseUnitSize / (1000 / FPS);
     }
 }
 
-// Render playable tetromino
 function drawGamePiece() {
     for (let i = 0; i < 4; i++) {
         context.beginPath();
@@ -266,7 +260,6 @@ function drawGamePiece() {
     }
 }
 
-// Render next tetromino
 function drawNextPiece() {
     for (let i = 0; i < 4; i++) {
         context.beginPath();
@@ -279,7 +272,6 @@ function drawNextPiece() {
     }
 }
 
-// Render fallen tetrominos
 function drawFallenPieces() {
     for (let i = 0; i < fallenPieces.length; i++) {
         context.beginPath();
@@ -292,7 +284,6 @@ function drawFallenPieces() {
     }
 }
 
-// Set up a new round
 function newRound() {
     fallSpeed = 1;
     allowDown = true;
@@ -301,7 +292,6 @@ function newRound() {
     addToQueue(1);
 }
 
-// Grab a new tetromino from the queue and assign new next piece
 function newGamePiece() {
     gamePiece.xPosition = canvas.width / 2;
     gamePiece.yPosition = - 3 * baseUnitSize;
@@ -443,7 +433,6 @@ function detectCompleteRows() {
     rowsCleared = 0;
 }
 
-// Clear completed row, recursively
 function clearRow(row) {
     for (let i = 0; i < fallenPieces.length; i++) {
         if (fallenPieces[i][1] == row) {
@@ -454,7 +443,6 @@ function clearRow(row) {
     }
 }
 
-// Shift rows down
 function shiftRowsDown(row) {
     for (let i = 0; i < fallenPieces.length; i++) {
         if (fallenPieces[i][1] <= row) {
@@ -488,7 +476,6 @@ function snapToGrid() {
     }
 }
 
-// Save fallen pieces
 var fallenPieces = [];
 
 function saveToFallen() {
@@ -498,7 +485,6 @@ function saveToFallen() {
     }
 }
 
-// Set piece orientation
 function rotateGamePiece(direction) {
     let tryingToRotateTo = 0;
     if (direction == "CLOCKWISE"){
@@ -540,7 +526,6 @@ function rotateGamePiece(direction) {
     }
 }
 
-// Move piece
 function moveGamePiece(direction) {
     if (direction == "LEFT") {
         if (gamePiece.xPosition + gamePiece.leftBoundary > 0 && detectLateralCollisionLeft() == false) { 
@@ -560,8 +545,50 @@ function moveGamePiece(direction) {
     else {
         console.log("Unknown game piece move direction: " + direction);
     }
-    debugHelper();
 }
+
+// Leaderboard
+//------------------------------------------------------------------------------
+
+function getLeaderboard() {
+    let xhr = new XMLHttpRequest();
+    xhr.open("POST", "http://otterwerks.net:2222/leaderboard", true);
+    xhr.setRequestHeader("Content-Type", "application/json; charset=UTF-8");
+    xhr.responseType = 'text';
+    xhr.onload = function () {
+        if (xhr.readyState === xhr.DONE && 
+            xhr.status === 200) {
+                leaderboard = JSON.parse(xhr.response).leaderboard;
+                return;
+            }
+    };    
+    xhr.send();
+}
+
+function submitScore() {
+    let xhr = new XMLHttpRequest();
+    xhr.open("POST", "http://otterwerks.net:2222/submitScore", true);
+    xhr.setRequestHeader("Content-Type", "application/json; charset=UTF-8");
+    console.log(xhr.responseText);
+    xhr.send(JSON.stringify({name: playerName, score: playerScore}));
+}
+
+function newHighScore() {
+    if (playerScore >= leaderboard[leaderboard.length].score) {
+        playerName = prompt("Enter your name:");
+        submitScore();
+    }
+}
+
+function buildLeaderboard() {
+    for (let i = 0; i < 5; i++) {
+        if (playerScore >= leaderboard[0].score) {
+            leaderboard.splice(i, 1, {name: playerName, score: playerScore});
+            return;
+        }
+    }
+}
+
 
 
 // Keyboard event listeners and friends
@@ -576,6 +603,7 @@ var touchStartX = 0;
 var touchStartY = 0;
 
 function touchStart(event) {
+    event.preventDefault();
     touchStartX = event.touches[0].pageX;
     touchStartY = event.touches[0].pageY;
 }
@@ -699,7 +727,6 @@ function keyDownHandler(event) {
 // Selectors for retreiving piece template formulas and boundaries
 //-------------------------------------------------------------------------
 
-// Access the correct template
 function selectGamePiece(target, orientation, type) {
     switch(type) {
         case "I":
@@ -760,7 +787,7 @@ function selectITetromino(target, orientation) {
             target.leftBoundary = - baseUnitSize;
             target.rightBoundary = 3 * baseUnitSize;
             break;
-        default: // error
+        default:
             console.log("I Tetromino orientation error")
     }
 }
@@ -781,7 +808,7 @@ function selectOTetromino(target, orientation) {
             target.leftBoundary = 0;
             target.rightBoundary = 2 * baseUnitSize;
             break;
-        default: // error
+        default:
             console.log("O Tetromino orientation error");
     }   
 }
@@ -829,7 +856,7 @@ function selectTTetromino(target, orientation) {
             target.leftBoundary = 0;
             target.rightBoundary = 2 * baseUnitSize;
             break;
-        default: // error
+        default:
             console.log("T Tetromino orientation error");
     }
 }
@@ -877,7 +904,7 @@ function selectJTetromino(target, orientation) {
             target.leftBoundary = 0;
             target.rightBoundary = 2 * baseUnitSize;
             break;
-        default: // error
+        default:
             console.log("J Tetromino orientation error");
     }
 }
@@ -925,7 +952,7 @@ function selectLTetromino(target, orientation) {
             target.leftBoundary = 0;
             target.rightBoundary = 2 * baseUnitSize;
             break;
-        default: // error
+        default:
             console.log("L Tetromino orientation error");
     }
 }
@@ -955,7 +982,7 @@ function selectSTetromino(target, orientation) {
             target.leftBoundary = - baseUnitSize;
             target.rightBoundary = 2 * baseUnitSize;
             break;
-        default: // error
+        default:
             console.log("S Tetromino orientation error");
     }
 }
@@ -985,21 +1012,7 @@ function selectZTetromino(target, orientation) {
             target.leftBoundary = 0;
             target.rightBoundary = 2 * baseUnitSize;
             break;
-        default: // error
+        default:
             console.log("Z Tetromino orientation error");
-    }
-}
-
-
-// Debug testing functionality
-//-------------------------------------------------------------------------
-
-if (DEBUG == true) {
-    // Reserved
-}
-
-function debugHelper() {
-    if (DEBUG == true) {
-        console.log("Game piece X, Y coords: " + gamePiece.xPosition + ", " + gamePiece.yPosition);
     }
 }

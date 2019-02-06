@@ -551,7 +551,7 @@ function moveGamePiece(direction) {
 
 function getLeaderboard() {
     let xhr = new XMLHttpRequest();
-    xhr.open("POST", "http://otterwerks.net:2222/leaderboard", true);
+    xhr.open("POST", "otterwerks.net:2222/leaderboard", true);
     xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
     xhr.setRequestHeader("Content-Type", "application/json; charset=UTF-8");
     xhr.responseType = 'text';

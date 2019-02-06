@@ -553,6 +553,7 @@ function moveGamePiece(direction) {
 function getLeaderboard() {
     let xhr = new XMLHttpRequest();
     xhr.open("POST", "http://otterwerks.net:2222/leaderboard", true);
+    xhr.header("Access-Control-Allow-Origin", "*");
     xhr.setRequestHeader("Content-Type", "application/json; charset=UTF-8");
     xhr.responseType = 'text';
     xhr.onload = function () {

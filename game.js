@@ -117,7 +117,7 @@ window.onload = function() {
         else if (gameState == 0) {
             drawStats();
             drawGameOver();
-            drawLeaderboard();
+            //drawLeaderboard();
         }
     }, 1000/FPS)
 }
@@ -137,7 +137,7 @@ function drawStats() {
 }
 
 function drawLeaderboard() {
-    buildLeaderboard();
+    //buildLeaderboard();
     for (let i = 0; i < leaderboard.length; i++) {
         context.font = (baseUnitSize / 2) + "px Helvetica";
         context.fillStyle = "CadetBlue";
@@ -185,7 +185,6 @@ function animateBlocksDown(t) {
             t += 10;
         }
     }
-    setTimeout(drawLeaderboard(), t);
 }
 
 function downCallBack(j, i){

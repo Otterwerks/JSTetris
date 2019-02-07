@@ -99,7 +99,6 @@ var gameState = 1;
 
 window.onload = function() {
     randomTheme();
-    getLeaderboard();
     addToQueue(3);
     setFuturePiece();
     newRound();

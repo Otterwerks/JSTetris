@@ -308,7 +308,7 @@ function drawShadowPiece() {
     for (let i = 0; i < 4; i++) {
         context.beginPath();
         context.lineWidth = baseUnitSize / 10;
-        context.strokeStyle = "lightgrey";
+        context.strokeStyle = "CadetBlue";
         context.rect(shadowPiece.template[i][0], shadowPiece.template[i][1], baseUnitSize, baseUnitSize);
         context.stroke();
     }

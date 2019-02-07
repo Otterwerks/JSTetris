@@ -305,6 +305,7 @@ function drawGamePiece() {
 
 function drawShadowPiece() {
     gamePieceShadow();
+    shadowPiece.updateTemplate();
     for (let i = 0; i < 4; i++) {
         context.beginPath();
         context.lineWidth = baseUnitSize / 10;

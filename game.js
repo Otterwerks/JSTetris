@@ -18,7 +18,7 @@ function setSize() {
     if (window.innerHeight >= window.innerWidth) {
         baseUnitSize = Math.floor(window.innerWidth * 0.9 / width / 10) * 10;
     }
-    else {
+    else if (window.innerHeight < window.innerWidth) {
         baseUnitSize = Math.floor(window.innerHeight * 0.9 / height / 10) * 10;
     }
     canvas.width = baseUnitSize * width;

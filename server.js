@@ -1,16 +1,24 @@
 var express = require('express');
 var mongojs = require('mongojs');
 var bodyParser = require('body-parser');
+var fs = require('fs');
+var https = require('https');
 var leaderBoard = express();
+
+var privateKey = fs.readFileSync('privkey.pem');
+var certificate = fs.readFileSync('cert.pem');
+var credentials = {key: privateKey, cert: certificate};
 
 leaderBoard.db = mongojs('JSTetris_server', ['scores']);
 
 leaderBoard.use(bodyParser.urlencoded({extended:false}));
 leaderBoard.use(bodyParser.json());
+leaderBoard.use('/folder', express.static('static'));
 
 leaderBoard.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  res.header("Access-Control-Allow-Methods", "OPTIOns, POST");
+  res.header("Access-Control-Allow-Headers", "Access-COntrol-Allow-Origin, Origin, X-Requested-With, Content-Type, Accept");
   res.header("Content-Type", "application/json; charset=UTF-8");
   next();
 });
@@ -47,6 +55,6 @@ leaderBoard.post("/leaderboard", function(req, res, next) {
 	});
 });
 
-var server = leaderBoard.listen(2222, function() {
-	console.log('Listening on port %d', server.address().port);
-});
+var httpsServer = https.createServer(credentials, leaderBoard);
+httpsServer.listen(2222);
+console.log('Listening on port %d', httpsServer.address().port);

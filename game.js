@@ -137,6 +137,7 @@ window.onload = function() {
             gravity();
             drawGrid();
             drawGamePiece();
+            drawShadowPiece();
             drawNextPiece();
             drawFallenPieces();
             drawStats();

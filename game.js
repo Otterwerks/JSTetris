@@ -616,9 +616,9 @@ function buildLeaderboard() {
 //------------------------------------------------------------------------------
 
 document.addEventListener("keydown", keyDownHandler, false);
-document.addEventListener("touchstart", touchStart, { passive: false });
-document.addEventListener("touchmove", touchMove, { passive: false });
-document.addEventListener("touchend", touchEnd, { passive: false });
+document.addEventListener("touchstart", touchStart, false);
+document.addEventListener("touchmove", touchMove, false);
+document.addEventListener("touchend", touchEnd, false);
 
 var touchStartX = 0;
 var touchStartY = 0;

@@ -16,7 +16,7 @@ let canvasRightSide = canvas.getBoundingClientRect().right; //is this used?
 
 function setSize() {
     if (window.innerHeight >= window.innerWidth) {
-        baseUnitSize = Math.floor(window.innerWidth * 0.9 / width);
+        baseUnitSize = Math.floor(window.innerWidth * 0.8 / width);
         console.log(baseUnitSize);
         console.log(window.innerWidth);
     }

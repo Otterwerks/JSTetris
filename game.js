@@ -121,7 +121,9 @@ window.onload = function() {
             drawLeaderboard();
         }
         else if (gameState == -1) {
-            checkNewHighScore();
+            If (leaderboard != 0) {
+                checkNewHighScore();
+            }
             gameState = 0;
         }
     }, 1000/FPS)

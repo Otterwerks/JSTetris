@@ -16,10 +16,10 @@ let canvasRightSide = canvas.getBoundingClientRect().right; //is this used?
 
 function setSize() {
     if (window.innerHeight >= window.innerWidth) {
-        baseUnitSize = Math.floor(window.innerWidth / width / 10) * 10;
+        baseUnitSize = Math.floor(window.innerWidth * 0.9 / width / 10) * 10;
     }
     else {
-        baseUnitSize = Math.floor(window.innerHeight / height / 10) * 10;
+        baseUnitSize = Math.floor(window.innerHeight * 0.9 / height / 10) * 10;
     }
     canvas.width = baseUnitSize * width;
     canvas.height = baseUnitSize * height;

@@ -121,7 +121,7 @@ window.onload = function() {
             drawLeaderboard();
         }
         else if (gameState == -1) {
-            If (leaderboard != 0) {
+            if (leaderboard != 0) {
                 checkNewHighScore();
             }
             gameState = 0;
@@ -616,9 +616,9 @@ function buildLeaderboard() {
 //------------------------------------------------------------------------------
 
 document.addEventListener("keydown", keyDownHandler, false);
-document.addEventListener("touchstart", touchStart, false);
-document.addEventListener("touchmove", touchMove, false);
-document.addEventListener("touchend", touchEnd, false);
+document.addEventListener("touchstart", touchStart, {passive: false});
+document.addEventListener("touchmove", touchMove, {passive: false});
+document.addEventListener("touchend", touchEnd, {passive: false});
 
 var touchStartX = 0;
 var touchStartY = 0;

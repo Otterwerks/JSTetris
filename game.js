@@ -309,7 +309,7 @@ function drawShadowPiece() {
     for (let i = 0; i < 4; i++) {
         context.beginPath();
         context.lineWidth = baseUnitSize / 10;
-        context.strokeStyle = "CadetBlue";
+        context.strokeStyle = "darkgrey";
         context.rect(shadowPiece.template[i][0], shadowPiece.template[i][1], baseUnitSize, baseUnitSize);
         context.stroke();
     }
@@ -366,7 +366,7 @@ function gamePieceShadow() {
         }
     }
     shadowPiece.xPosition = gamePiece.xPosition;
-    shadowPiece.yPosition = Math.min(...topOfFallen);
+    shadowPiece.yPosition = Math.min(...topOfFallen) - baseUnitSize;
 }
 
 // Collision detection helper function, prevents fallthroughs

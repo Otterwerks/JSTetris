@@ -357,7 +357,7 @@ function newGamePiece() {
 }
 
 function gamePieceShadow() {
-    let bottomOfpiece = [];
+    let bottomOfPiece = [];
     let topOfFallen = [];
     for (let i = 0; i < 4; i++) {
         bottomOfPiece.push(gamePiece.template[i][1]);

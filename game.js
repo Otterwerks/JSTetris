@@ -27,6 +27,8 @@ function setSize() {
     }
     canvas.width = baseUnitSize * width;
     canvas.height = baseUnitSize * height;
+    futurPiece.xPosition = canvas.width - (3 * baseUnitSize);
+    futurePiece.yPosition = baseUnitSize + (baseUnitSize / 2);
 }
 
 var gamePiece = {

@@ -369,7 +369,7 @@ function gamePieceShadow() {
     }
     let heightOfPiece = Math.max(...bottomOfPiece) - Math.min(...bottomOfPiece);
     shadowPiece.xPosition = gamePiece.xPosition;
-    shadowPiece.yPosition = Math.min(...topOfFallen);
+    shadowPiece.yPosition = Math.min(...topOfFallen) - heightOfPiece;
 }
 
 // Collision detection helper function, prevents fallthroughs

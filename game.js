@@ -59,6 +59,18 @@ var futurePiece = {
     ]
 };
 
+var shadowPiece = {
+    xPosition : canvas.width / 2,
+    yPosition : 0,
+    updateTemplate : function() {selectGamePiece(shadowPiece, gamePiece.orientation, gamePiece.type)},
+    template : [
+        [], // each element is an array
+        [], // of values which represent
+        [], // the coordinates of each square
+        []  // that make the current tetromino
+    ]
+};
+
 function drawGrid() {
     for (i = 0; i <= canvas.width; i += baseUnitSize) {
         context.beginPath();
@@ -290,6 +302,17 @@ function drawGamePiece() {
     }
 }
 
+function drawShadowPiece() {
+    gamePieceShadow();
+    for (let i = 0; i < 4; i++) {
+        context.beginPath();
+        context.lineWidth = baseUnitSize / 10;
+        context.strokeStyle = "lightgrey";
+        context.rect(shadowPiece.template[i][0], shadowPiece.template[i][1], baseUnitSize, baseUnitSize);
+        context.stroke();
+    }
+}
+
 function drawNextPiece() {
     for (let i = 0; i < 4; i++) {
         context.beginPath();
@@ -329,6 +352,19 @@ function newGamePiece() {
     gamePiece.type = futurePiece.type;
     gamePiece.color = futurePiece.color;
     gamePiece.updateTemplate();
+}
+
+function gamePieceShadow() {
+    let topOfFallen = [];
+    for (let i = 0; i < 4; i++) {
+        for (let j = 0; j < fallenPieces.length; j++) {
+            if (gamePiece.template[i][0] == fallenPieces[j][0]) {
+                topOfFallen.push(fallenPieces[j][1]);
+            }
+        }
+    }
+    shadowPiece.xPosition = gamePiece.xPosition;
+    shadowPiece.yPosition = Math.min(...topOfFallen);
 }
 
 // Collision detection helper function, prevents fallthroughs

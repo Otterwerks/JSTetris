@@ -99,6 +99,7 @@ var gameState = 1;
 
 window.onload = function() {
     randomTheme();
+    getLeaderboard();
     addToQueue(3);
     setFuturePiece();
     newRound();
@@ -115,9 +116,14 @@ window.onload = function() {
             drawStats();
         }
         else if (gameState == 0) {
+            context.clearRect(0, 0, canvas.width, canvas.height);
             drawStats();
             drawGameOver();
-            //drawLeaderboard();
+            drawLeaderboard();
+        }
+        else if (gameState == -1) {
+            checkNewHighScore();
+            gameState = 0;
         }
     }, 1000/FPS)
 }
@@ -127,7 +133,7 @@ window.onload = function() {
 
 var playerScore = 0;
 var playerName = "";
-var leaderboard = [];
+var leaderboard = 0;
 
 function drawStats() {
     context.font = (baseUnitSize / 2) + "px Monaco";
@@ -137,12 +143,20 @@ function drawStats() {
 }
 
 function drawLeaderboard() {
-    //buildLeaderboard();
-    for (let i = 0; i < leaderboard.length; i++) {
+    if (leaderboard != 0) {
+        for (let i = 0; i < leaderboard.length; i++) {
+            context.font = (baseUnitSize / 2) + "px Helvetica";
+            context.fillStyle = "SteelBlue";
+            context.textAlign = "center";
+            context.fillText("LEADERBOARD", (canvas.width / 2), ((canvas.height / 2) - baseUnitSize));
+            context.fillText((leaderboard[i].name + ": " + leaderboard[i].score), (canvas.width / 2), ((canvas.height / 2) + (i * baseUnitSize)));
+        }
+    }
+    else if (leaderboard == 0) {
         context.font = (baseUnitSize / 2) + "px Helvetica";
-        context.fillStyle = "CadetBlue";
+        context.fillStyle = "SteelBlue";
         context.textAlign = "center";
-        context.fillText((leaderboard[i].name + ": " + leaderboard[i].score), (canvas.width / 2), ((canvas.height / 2) + (i * baseUnitSize)));
+        context.fillText("Leaderboard Unavailable...", (canvas.width / 2), (canvas.height / 2));
     }
 }
 
@@ -151,7 +165,7 @@ function drawGameOver() {
     context.fillStyle = "#555";
     context.textAlign = "center";
     context.fillText("GAME OVER", (canvas.width / 2), (canvas.height / 4));
-    context.fillText(totalRowsCleared + " rows cleared.", (canvas.width / 2), (canvas.height / 4) + baseUnitSize);
+    context.fillText(totalRowsCleared + " row(s) cleared.", (canvas.width / 2), (canvas.height / 4) + baseUnitSize);
     context.fillText("Refresh page to play again", (canvas.width / 2), (canvas.height / 4) + 2 * baseUnitSize);
 }
 
@@ -185,6 +199,7 @@ function animateBlocksDown(t) {
             t += 10;
         }
     }
+    setTimeout(function() {gameState = -1;}, t);
 }
 
 function downCallBack(j, i){
@@ -206,7 +221,7 @@ function checkLoss() {
     for (i = 0; i < 4; i++) {
         if (gamePiece.template[i][1] <= 0) {
             // Game over!
-            gameState = 0;
+            gameState = -99;
             getLeaderboard();
             animateBlocksUp();
             return;
@@ -552,7 +567,6 @@ function moveGamePiece(direction) {
 function getLeaderboard() {
     let xhr = new XMLHttpRequest();
     xhr.open("POST", "https://otterwerks.net:2222/leaderboard", true);
-    //xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
     xhr.setRequestHeader("Content-Type", "application/json; charset=UTF-8");
     xhr.responseType = 'text';
     xhr.onload = function () {
@@ -568,23 +582,27 @@ function getLeaderboard() {
 
 function submitScore() {
     let xhr = new XMLHttpRequest();
-    xhr.open("POST", "http://otterwerks.net:2222/submitScore", true);
+    xhr.open("POST", "https://otterwerks.net:2222/submitScore", true);
     xhr.setRequestHeader("Content-Type", "application/json; charset=UTF-8");
     console.log(xhr.responseText);
     xhr.send(JSON.stringify({name: playerName, score: playerScore}));
 }
 
-function newHighScore() {
-    if (playerScore >= leaderboard[leaderboard.length].score) {
-        playerName = prompt("Enter your name:");
-        submitScore();
+function checkNewHighScore() {
+    if (leaderboard != 0) {
+        if (playerScore >= leaderboard[(leaderboard.length) - 1].score) {
+            playerName = prompt("Enter your name:");
+            submitScore();
+            buildLeaderboard();
+        }
     }
 }
 
 function buildLeaderboard() {
     for (let i = 0; i < 5; i++) {
-        if (playerScore >= leaderboard[0].score) {
+        if (playerScore >= leaderboard[i].score) {
             leaderboard.splice(i, 1, {name: playerName, score: playerScore});
+            console.log(leaderboard);
             return;
         }
     }

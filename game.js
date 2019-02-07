@@ -600,7 +600,8 @@ function checkNewHighScore() {
 function buildLeaderboard() {
     for (let i = 0; i < 5; i++) {
         if (playerScore >= leaderboard[i].score) {
-            leaderboard.splice(i, 1, {name: playerName, score: playerScore});
+            leaderboard.splice(i, 0, {name: playerName, score: playerScore});
+            leaderboard.pop();
             console.log(leaderboard);
             return;
         }

@@ -18,7 +18,7 @@ leaderBoard.use('/folder', express.static('static'));
 leaderBoard.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Methods", "OPTIOns, POST");
-  res.header("Access-Control-Allow-Headers", "Access-COntrol-Allow-Origin, Origin, X-Requested-With, Content-Type, Accept");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   res.header("Content-Type", "application/json; charset=UTF-8");
   next();
 });
@@ -51,10 +51,12 @@ leaderBoard.post("/leaderboard", function(req, res, next) {
 			res.send({error:"Internal database error"});
 			return;
 		}
-		res.json({success:true, "leaderboard": result});
+		res.json({"leaderboard": result});
 	});
 });
 
 var httpsServer = https.createServer(credentials, leaderBoard);
 httpsServer.listen(2222);
 console.log('Listening on port %d', httpsServer.address().port);
+
+

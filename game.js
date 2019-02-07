@@ -21,7 +21,7 @@ function setSize() {
         console.log(window.innerWidth);
     }
     else if (window.innerHeight < window.innerWidth) {
-        baseUnitSize = Math.floor(window.innerHeight * 0.9 / height;
+        baseUnitSize = Math.floor(window.innerHeight * 0.9 / height);
         console.log(baseUnitSize);
         console.log(window.innerHeight);
     }

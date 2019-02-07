@@ -15,6 +15,15 @@ canvas.height = baseUnitSize * height;
 let canvasLeftSide = canvas.getBoundingClientRect().left;
 let canvasRightSide = canvas.getBoundingClientRect().right;
 
+function setSize() {
+    if (window.innerHeight >= window.innerWidth) {
+        baseUnitSize = Math.floor(window.innerWidth / width / 10) * 10;
+    }
+    else {
+        baseUnitSize = Math.floor(window.innerHeight / height / 10) * 10;
+    }
+}
+
 var gamePiece = {
     xPosition : canvas.width / 2,
     yPosition : 0,
@@ -98,6 +107,7 @@ function randomTheme() {
 var gameState = 1;
 
 window.onload = function() {
+    setSize();
     randomTheme();
     addToQueue(3);
     setFuturePiece();

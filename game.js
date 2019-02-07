@@ -357,16 +357,19 @@ function newGamePiece() {
 }
 
 function gamePieceShadow() {
+    let bottomOfpiece = [];
     let topOfFallen = [];
     for (let i = 0; i < 4; i++) {
+        bottomOfPiece.push(gamePiece.template[i][1]);
         for (let j = 0; j < fallenPieces.length; j++) {
             if (gamePiece.template[i][0] == fallenPieces[j][0]) {
                 topOfFallen.push(fallenPieces[j][1]);
             }
         }
     }
+    let heightOfPiece = Math.max(...bottomOfPiece) - Math.min(...bottomOfPiece);
     shadowPiece.xPosition = gamePiece.xPosition;
-    shadowPiece.yPosition = Math.min(...topOfFallen) - baseUnitSize;
+    shadowPiece.yPosition = Math.min(...topOfFallen);
 }
 
 // Collision detection helper function, prevents fallthroughs

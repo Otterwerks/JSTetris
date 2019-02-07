@@ -551,14 +551,15 @@ function moveGamePiece(direction) {
 
 function getLeaderboard() {
     let xhr = new XMLHttpRequest();
-    xhr.open("POST", "http://otterwerks.net:2222/leaderboard", true);
-    xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+    xhr.open("POST", "https://otterwerks.net:2222/leaderboard", true);
+    //xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
     xhr.setRequestHeader("Content-Type", "application/json; charset=UTF-8");
     xhr.responseType = 'text';
     xhr.onload = function () {
         if (xhr.readyState === xhr.DONE && 
             xhr.status === 200) {
                 leaderboard = JSON.parse(xhr.response).leaderboard;
+                console.log(leaderboard);
                 return;
             }
     };    

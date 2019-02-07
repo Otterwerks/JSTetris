@@ -10,10 +10,9 @@ const DEBUG = false; // Enable testing functionality (read: cheats)
 
 var width = 10;
 var height = 20;
-canvas.width = baseUnitSize * width;
-canvas.height = baseUnitSize * height;
-let canvasLeftSide = canvas.getBoundingClientRect().left;
-let canvasRightSide = canvas.getBoundingClientRect().right;
+
+let canvasLeftSide = canvas.getBoundingClientRect().left; //is this used?
+let canvasRightSide = canvas.getBoundingClientRect().right; //is this used?
 
 function setSize() {
     if (window.innerHeight >= window.innerWidth) {
@@ -22,6 +21,8 @@ function setSize() {
     else {
         baseUnitSize = Math.floor(window.innerHeight / height / 10) * 10;
     }
+    canvas.width = baseUnitSize * width;
+    canvas.height = baseUnitSize * height;
 }
 
 var gamePiece = {

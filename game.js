@@ -368,7 +368,7 @@ function gamePieceShadow() {
             for (let j = 0; j < fallenPieces.length; j++) {
                 if (shadowPiece.template[i][0] == fallenPieces[j][0] &&
                     shadowPiece.template[i][1] > fallenPieces[j][1]) {
-                        shadowPiece.yPosition = shadowPiece.yPosition - (shadowPiece.template[i][1] - fallenPieces[j][1]);
+                        shadowPiece.yPosition = shadowPiece.yPosition - (shadowPiece.template[i][1] - fallenPieces[j][1]) - baseUnitSize;
                         shadowPiece.updateTemplate();
                 }
             }

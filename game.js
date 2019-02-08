@@ -357,7 +357,6 @@ function newGamePiece() {
 }
 
 function gamePieceShadow() {
-    let bottomOfPiece = [];
     let topOfFallen = [];
     for (let i = 0; i < 4; i++) {
         bottomOfPiece.push(gamePiece.template[i][1]);
@@ -367,10 +366,24 @@ function gamePieceShadow() {
             }
         }
     }
-    let heightOfPiece = Math.max(...bottomOfPiece) - Math.min(...bottomOfPiece);
     shadowPiece.xPosition = gamePiece.xPosition;
-    shadowPiece.yPosition = Math.min(...topOfFallen) - heightOfPiece;
+    shadowPiece.yPosition = Math.min(...topOfFallen);
+    shadowPiece.updateTemplate;
+    alignShadowPiece();
 }
+
+function alignShadowPiece(); {
+    for (let i = 0; i < 4; i++) {
+        for (let j = 0; j < fallenPieces.length; j++) {
+            if (shadowPiece.template[i][0] == fallenPieces.template[j][0] &&
+                shadowPiece.template[i][1] > fallenPieces.template[j][1]) {
+                    shadowPiece.yPosition = shadowPiece.template[i][1] - fallenPieces.template[j][1];
+                    shadowPiece.updateTemplate();
+            }
+        }
+    }
+}
+
 
 // Collision detection helper function, prevents fallthroughs
 function willCollide() {

@@ -294,10 +294,10 @@ function gravity() {
 var gamePlayRounds = 0;
 
 function setDifficulty() {
-    if (gamePlayRounds % 10 == 0 && gamePlayRounds > 0) {
+    if (gamePlayRounds % 15 == 0 && gamePlayRounds > 0) {
         let challengeRows = 0;
-        if (gamePlayRounds <= 30) {
-            challengeRows = gamePlayRounds / 10;
+        if (gamePlayRounds <= 45) {
+            challengeRows = gamePlayRounds / 15;
         }
         else {
             challengeRows = 3;
@@ -428,8 +428,7 @@ function gamePieceShadow() {
                 }
             }
         }
-    }
-    
+    }    
 }
                 
 

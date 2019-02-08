@@ -305,7 +305,6 @@ function drawGamePiece() {
 
 function drawShadowPiece() {
     gamePieceShadow();
-    shadowPiece.updateTemplate();
     for (let i = 0; i < 4; i++) {
         context.beginPath();
         context.lineWidth = baseUnitSize / 10;
@@ -357,6 +356,24 @@ function newGamePiece() {
 }
 
 function gamePieceShadow() {
+    shadowPiece.xPosition = gamePiece.xPosition;
+    shadowPiece.yPosition = canvas.height;
+    shadowPiece.updateTemplate();
+    for (let i = 0; i < 4; i++) {
+        for (let j = 0; j < fallenPieces.length; j++) {
+            if (shadowPiece.template[i][0] == fallenPieces.template[j][0] &&
+                shadowPiece.template[i][1] > fallenPieces.template[j][1]) {
+                    shadowPiece.yPosition = shadowPiece.yPosition - (shadowPiece.template[i][1] - fallenPieces.template[j][1]);
+                    shadowPiece.updateTemplate();
+            }
+        }
+    }
+}
+                
+
+
+/*
+function gamePieceShadow() {
     let topOfFallen = [];
     for (let i = 0; i < 4; i++) {
         for (let j = 0; j < fallenPieces.length; j++) {
@@ -383,7 +400,7 @@ function alignShadowPiece() {
         }
     }
 }
-
+*/
 
 // Collision detection helper function, prevents fallthroughs
 function willCollide() {

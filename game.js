@@ -367,6 +367,7 @@ function gamePieceShadow() {
         else if (fallenPieces.length > 0) {
             for (let j = 0; j < fallenPieces.length; j++) {
                 if (shadowPiece.template[i][0] == fallenPieces[j][0] &&
+                    (gamePiece.template[i][1] + baseUnitSize) < fallenPieces[j][1] &&
                     (shadowPiece.template[i][1] + baseUnitSize) > fallenPieces[j][1]) {
                         shadowPiece.yPosition = shadowPiece.yPosition - (shadowPiece.template[i][1] - fallenPieces[j][1]) - baseUnitSize;
                         shadowPiece.updateTemplate();
@@ -374,39 +375,26 @@ function gamePieceShadow() {
             }
         }
     }
+    // Looped through again to make shadow work, temporary fix!
+    for (let i = 0; i < 4; i++) {
+        if ((shadowPiece.template[i][1] + baseUnitSize) > canvas.height) {
+            shadowPiece.yPosition = shadowPiece.yPosition - (shadowPiece.template[i][1] - canvas.height) - baseUnitSize;
+            shadowPiece.updateTemplate();
+        }
+        else if (fallenPieces.length > 0) {
+            for (let j = 0; j < fallenPieces.length; j++) {
+                if (shadowPiece.template[i][0] == fallenPieces[j][0] &&
+                    (gamePiece.template[i][1] + baseUnitSize) < fallenPieces[j][1] &&
+                    (shadowPiece.template[i][1] + baseUnitSize) > fallenPieces[j][1]) {
+                        shadowPiece.yPosition = shadowPiece.yPosition - (shadowPiece.template[i][1] - fallenPieces[j][1]) - baseUnitSize;
+                        shadowPiece.updateTemplate();
+                }
+            }
+        }
+    }
+    
 }
                 
-
-
-/*
-function gamePieceShadow() {
-    let topOfFallen = [];
-    for (let i = 0; i < 4; i++) {
-        for (let j = 0; j < fallenPieces.length; j++) {
-            if (gamePiece.template[i][0] == fallenPieces[j][0]) {
-                topOfFallen.push(fallenPieces[j][1]);
-            }
-        }
-    }
-    shadowPiece.xPosition = gamePiece.xPosition;
-    shadowPiece.yPosition = Math.min(...topOfFallen);
-    shadowPiece.updateTemplate;
-    alignShadowPiece();
-}
-
-function alignShadowPiece() {
-    console.log(shadowPiece.template);
-    for (let i = 0; i < 4; i++) {
-        for (let j = 0; j < fallenPieces.length; j++) {
-            if (shadowPiece.template[i][0] == fallenPieces.template[j][0] &&
-                shadowPiece.template[i][1] > fallenPieces.template[j][1]) {
-                    shadowPiece.yPosition = shadowPiece.yPosition - (shadowPiece.template[i][1] - fallenPieces.template[j][1]);
-                    shadowPiece.updateTemplate();
-            }
-        }
-    }
-}
-*/
 
 // Collision detection helper function, prevents fallthroughs
 function willCollide() {

@@ -366,9 +366,9 @@ function gamePieceShadow() {
         }
         else if (fallenPieces.length > 0) {
             for (let j = fallenPieces.length; j > 0; j--) {
-                if (shadowPiece.template[i][0] == fallenPieces[j][0] &&
-                    (shadowPiece.template[i][1] + baseUnitSize) > fallenPieces[j][1]) {
-                        shadowPiece.yPosition = shadowPiece.yPosition - (shadowPiece.template[i][1] - fallenPieces[j][1]) - baseUnitSize;
+                if (shadowPiece.template[i][0] == fallenPieces[j - 1][0] &&
+                    (shadowPiece.template[i][1] + baseUnitSize) > fallenPieces[j - 1][1]) {
+                        shadowPiece.yPosition = shadowPiece.yPosition - (shadowPiece.template[i][1] - fallenPieces[j - 1][1]) - baseUnitSize;
                         shadowPiece.updateTemplate();
                 }
             }

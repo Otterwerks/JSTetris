@@ -291,6 +291,42 @@ function gravity() {
     }
 }
 
+var gamePlayRounds = 0;
+
+function setDifficulty() {
+    if (gamePlayRounds % 10 == 0 && gamePlayRounds > 0) {
+        let challengeRows = 0;
+        if (gamePlayRounds <= 30) {
+            challengeRows = gamePlayRounds / 10;
+        }
+        else {
+            challengeRows = 3;
+        }
+        createChallengeRow(challengeRows);
+    }
+    fallSpeed = Math.floor(playerScore / 100) + 1;
+}
+
+function createChallengeRow(numberOfRows) {
+    for (let j = 0; j < numberOfRows; j++) {
+        for (let i = 0; i < fallenPieces.length; i++) {
+            fallenPieces[i][1] -= baseUnitSize;
+        }
+        let maxChallengeBlocks = width - 1;
+        let blockDistribution = [];
+        for (let i = 0; i < width; i++) {
+            blockDistribution.push(Math.random());
+        }
+        blockDistribution.push(Math.floor(Math.random() * (width - 1)))
+        for (let i = 0; i < width; i++) {
+            if (blockDistribution[i] > 0.25 && maxChallengeBlocks > 0) {
+                fallenPieces.push([(i * baseUnitSize), (canvas.height - baseUnitSize), (colors.length - 1)]);
+                maxChallengeBlocks--;
+            }
+        }
+    }
+}
+
 function drawGamePiece() {
     for (let i = 0; i < 4; i++) {
         context.beginPath();
@@ -339,8 +375,8 @@ function drawFallenPieces() {
 }
 
 function newRound() {
-    fallSpeed = 1;
     allowDown = true;
+    setDifficulty();
     newGamePiece();
     setFuturePiece();
     addToQueue(1);
@@ -353,6 +389,7 @@ function newGamePiece() {
     gamePiece.type = futurePiece.type;
     gamePiece.color = futurePiece.color;
     gamePiece.updateTemplate();
+    gamePlayRounds ++;
 }
 
 function gamePieceShadow() {

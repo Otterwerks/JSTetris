@@ -372,7 +372,7 @@ function gamePieceShadow() {
     alignShadowPiece();
 }
 
-function alignShadowPiece(); {
+function alignShadowPiece() {
     for (let i = 0; i < 4; i++) {
         for (let j = 0; j < fallenPieces.length; j++) {
             if (shadowPiece.template[i][0] == fallenPieces.template[j][0] &&

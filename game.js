@@ -359,14 +359,18 @@ function gamePieceShadow() {
     shadowPiece.xPosition = gamePiece.xPosition;
     shadowPiece.yPosition = canvas.height;
     shadowPiece.updateTemplate();
-    console.log(shadowPiece.template);
-    console.log(shadowPiece.template[0][0]);
     for (let i = 0; i < 4; i++) {
-        for (let j = 0; j < fallenPieces.length; j++) {
-            if (shadowPiece.template[i][0] == fallenPieces.template[j][0] &&
-                shadowPiece.template[i][1] > fallenPieces.template[j][1]) {
-                    shadowPiece.yPosition = shadowPiece.yPosition - (shadowPiece.template[i][1] - fallenPieces.template[j][1]);
-                    shadowPiece.updateTemplate();
+        if (fallenPieces.length == 0) {
+            shadowPiece.yPosition = ShadowPiece.yPosition - (shadowPiece.template[i][1] - canvas.height);
+            shadowPiece.updateTemplate();
+        }
+        else if (fallenPieces.length > 0) {
+            for (let j = 0; j < fallenPieces.length; j++) {
+                if (shadowPiece.template[i][0] == fallenPieces.template[j][0] &&
+                    shadowPiece.template[i][1] > fallenPieces.template[j][1]) {
+                        shadowPiece.yPosition = shadowPiece.yPosition - (shadowPiece.template[i][1] - fallenPieces.template[j][1]);
+                        shadowPiece.updateTemplate();
+                }
             }
         }
     }

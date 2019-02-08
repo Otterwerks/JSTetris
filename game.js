@@ -360,7 +360,7 @@ function gamePieceShadow() {
     shadowPiece.yPosition = canvas.height;
     shadowPiece.updateTemplate();
     console.log(shadowPiece.template);
-    console.log(shadowPiece.template[1][1]);
+    console.log(shadowPiece.template[0][0]);
     for (let i = 0; i < 4; i++) {
         for (let j = 0; j < fallenPieces.length; j++) {
             if (shadowPiece.template[i][0] == fallenPieces.template[j][0] &&

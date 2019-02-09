@@ -39,7 +39,7 @@ function setSize() {
     sideCanvas.style.top = baseUnitSize + "px";
 
     futurePiece.xPosition = 2 * baseUnitSize;
-    futurePiece.yPosition = 2 * baseUnitSize;
+    futurePiece.yPosition = 3 * baseUnitSize;
     initializeLayout();
 }
 
@@ -133,10 +133,10 @@ function drawFrame() {
     sideContext.stroke();
 
     sideContext.beginPath();
-    sideContext.moveTo(0, baseUnitSize * 6);
-    sideContext.lineTo(sideCanvas.width, baseUnitSize * 6);
-    sideContext.moveTo(0, baseUnitSize * 14);
-    sideContext.lineTo(sideCanvas.width, baseUnitSize * 14);
+    sideContext.moveTo(0, baseUnitSize * 7);
+    sideContext.lineTo(sideCanvas.width, baseUnitSize * 7);
+    sideContext.moveTo(0, baseUnitSize * 17);
+    sideContext.lineTo(sideCanvas.width, baseUnitSize * 17);
     sideContext.lineWidth = baseUnitSize / 10;
     sideContext.strokeStyle = "black";
     sideContext.stroke();
@@ -229,7 +229,7 @@ window.onload = function() {
             drawLeaderboard();
         }
         else if (gameState == -1) {
-            if (leaderboard != 0) {
+            if (leaderboard != 0 && serverStatus.status == "Online") {
                 checkNewHighScore();
             }
             gameState = 0;
@@ -248,47 +248,49 @@ function drawStats() {
     sideContext.font = "bold " + (baseUnitSize / 2) + "px Helvetica";
     sideContext.fillStyle = "#555";
     sideContext.textAlign = "center";
-    sideContext.fillText("Next Piece", sideCanvas.width / 2, baseUnitSize / 1.5);
-    sideContext.fillText("Game Stats", sideCanvas.width / 2, baseUnitSize * 7);
+    sideContext.fillText("Next Piece", sideCanvas.width / 2, baseUnitSize);
+    sideContext.fillText("Game Stats", sideCanvas.width / 2, baseUnitSize * 8);
     sideContext.font = (baseUnitSize / 2) + "px Helvetica";
     sideContext.textAlign = "left";
-    sideContext.fillText("Score: " + playerScore, baseUnitSize, baseUnitSize * 8);
-    sideContext.fillText("Rows Cleared: " + totalRowsCleared, baseUnitSize, baseUnitSize * 9);
-    sideContext.fillText("Round: " + gamePlayRounds, baseUnitSize, baseUnitSize * 10);
-    sideContext.fillText("Speed: " + fallSpeed, baseUnitSize, baseUnitSize * 11);
-    sideContext.fillText("Theme: " + activeTheme, baseUnitSize, baseUnitSize * 12);
+    sideContext.fillText("Score: " + playerScore, baseUnitSize, baseUnitSize * 9);
+    sideContext.fillText("Rows Cleared: " + totalRowsCleared, baseUnitSize, baseUnitSize * 10);
+    sideContext.fillText("Round: " + gamePlayRounds, baseUnitSize, baseUnitSize * 11);
+    sideContext.fillText("Speed: " + fallSpeed, baseUnitSize, baseUnitSize * 12);
+    sideContext.fillText("Theme: " + activeTheme, baseUnitSize, baseUnitSize * 13);
     sideContext.font = "bold " + (baseUnitSize / 2) + "px Helvetica";
     sideContext.textAlign = "center";
-    sideContext.fillText("Server Status", sideCanvas.width / 2, baseUnitSize * 15);
+    sideContext.fillText("Server Status", sideCanvas.width / 2, baseUnitSize * 18);
     sideContext.font = (baseUnitSize / 2) + "px Helvetica";
     sideContext.fillStyle = serverStatus.color;
-    sideContext.fillText(serverStatus.status, sideCanvas.width / 2, baseUnitSize * 16);
+    sideContext.fillText(serverStatus.status, sideCanvas.width / 2, baseUnitSize * 19);
 }
 
 function drawLeaderboard() {
     if (leaderboard != 0) {
         for (let i = 0; i < leaderboard.length; i++) {
-            context.font = (baseUnitSize / 2) + "px Helvetica";
+            context.font = baseUnitSize + "px Helvetica";
             context.fillStyle = "SteelBlue";
             context.textAlign = "center";
-            context.fillText("LEADERBOARD", (canvas.width / 2), ((canvas.height / 2) - baseUnitSize));
-            context.fillText((leaderboard[i].name + ": " + leaderboard[i].score), (canvas.width / 2), ((canvas.height / 2) + (i * baseUnitSize)));
+            context.fillText("LEADERBOARD", (canvas.width / 2), baseUnitSize * 7);
+            context.font = (baseUnitSize / 2) + "px Helvetica";
+            context.fillText((leaderboard[i].name + ": " + leaderboard[i].score), (canvas.width / 2), (baseUnitSize * 8) + (i * baseUnitSize));
         }
     }
     else if (leaderboard == 0) {
         context.font = (baseUnitSize / 2) + "px Helvetica";
         context.fillStyle = "SteelBlue";
         context.textAlign = "center";
-        context.fillText("Leaderboard Unavailable...", (canvas.width / 2), (canvas.height / 2));
+        context.fillText("Leaderboard Unavailable...", (canvas.width / 2), baseUnitSize * 6);
     }
 }
 
 function drawGameOver() {
-    context.font = (baseUnitSize / 2) + "px Monaco";
+    context.font = baseUnitSize + "px Monaco";
     context.fillStyle = "#555";
     context.textAlign = "center";
-    context.fillText("GAME OVER", (canvas.width / 2), (canvas.height / 4));
-    context.fillText("Refresh page to play again", (canvas.width / 2), (canvas.height / 4) + 2 * baseUnitSize);
+    context.fillText("GAME OVER", (canvas.width / 2), baseUnitSize * 2);
+    context.font = (baseUnitSize / 2) + "px Monaco";
+    context.fillText("Refresh page to play again", (canvas.width / 2), baseUnitSize * 3);
 }
 
 function animateBlocksUp() {
@@ -345,7 +347,9 @@ function checkLoss() {
         if (gamePiece.template[i][1] <= 0) {
             // Game over!
             gameState = -99;
-            getLeaderboard();
+            if (serverStatus.status == "Online") {
+                getLeaderboard();
+            }
             animateBlocksUp();
             return;
         }

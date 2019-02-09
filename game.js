@@ -166,28 +166,28 @@ var gridColor = "#ccc";
 // const THEME_99 = ["", "", "", "", ""]; copy paste for adding new theme
 
 var themes = [
-    ["#ED6A5A", "#F4F1BB", "#9BC1BC", "#7D7C84", "#E6EBE0"], // theme 1
-    ["#FBF5F3", "#522B47", "#7B0828", "#7D7C84", "#0F0E0E"], // theme 2
-    ["#FF715B", "#522B47", "#FFFFFF", "#7D7C84", "#1EA896"], // theme 3
-    ["#F4E76E", "#F7FE72", "#8FF7A7", "#7D7C84", "#51BBFE"], // theme 4
-    ["#FFEEF2", "#FFE4F3", "#FFC8FB", "#7D7C84", "#FF92C2"], // theme 5
+    //["#ED6A5A", "#9BC1BC", "#F4F1BB", "#7D7C84", "#E6EBE0"], // theme 1 ([4] is too light)
+    //["#FBF5F3", "#522B47", "#7B0828", "#7D7C84", "#0F0E0E"], // theme 2
+    //["#FF715B", "#522B47", "#FFFFFF", "#7D7C84", "#1EA896"], // theme 3
+    //["#F4E76E", "#F7FE72", "#8FF7A7", "#7D7C84", "#51BBFE"], // theme 4
+    ["#FFEEF2", "#FFE4F3", "#FFC8FB", "#7D7C84", "#FF92C2"], // theme 5 (pink theme)
     ["#3D5A80", "#98C1D9", "#E0FBFC", "#EE6C4D", "#293241"], // theme 6
     ["#D8A47F", "#EF8354", "#EE4B6A", "#DF3B57", "#0F7173"], // theme 7
     ["#725752", "#878E88", "#96C0B7", "#D4DFC7", "#FEF6C9"], // theme 8
-    ["#DBF4AD", "#A9E190", "#CDC776", "#A5AA52", "#767522"], // theme 9
-    ["#EAF2E3", "#61E8E1", "#F25757", "#F2E863", "#F2CD60"], // theme 10
-    ["#C1C1C1", "#2C4251", "#D16666", "#B6C649", "#FFFFFF"], // theme 11
+    //["#DBF4AD", "#A9E190", "#CDC776", "#A5AA52", "#767522"], // theme 9
+    //["#EAF2E3", "#61E8E1", "#F25757", "#F2E863", "#F2CD60"], // theme 10
+    //["#C1C1C1", "#2C4251", "#D16666", "#B6C649", "#FFFFFF"], // theme 11
     ["#2F4046", "#124559", "#598392", "#AEC3B0", "#83877B"], // theme 12
     ["#012622", "#003B36", "#6C696E", "#E98A15", "#59114D"], // theme 13
-    ["#DD6E42", "#E8DAB2", "#4F6D7A", "#C0D6DF", "#808080"], // theme 14 +
-    ["#BEE9E8", "#62B6CB", "#1B4965", "#A6BFD1", "#5FA8D3"], // theme 15
+    ["#DD6E42", "#E8DAB2", "#4F6D7A", "#C0D6DF", "#808080"], // theme 14
+    ["#BEE9E8", "#62B6CB", "#1B4965", "#A6BFD1", "#5FA8D3"], // theme 15 blue theme)
     ["#FFB997", "#F67E7D", "#843B62", "#211940", "#74546A"], // theme 16
-    ["#FAA916", "#FBFFFE", "#6D676E", "#2F2F32", "#96031A"], // theme 17
+    //["#FAA916", "#FBFFFE", "#6D676E", "#2F2F32", "#96031A"], // theme 17 ([1] is white)
     ["#BFB1CC", "#6C6E6C", "#60495A", "#3F3244", "#2F2235"], // theme 18
-    ["#171C55", "#74A4BC", "#B6D6CC", "#F1FEC6", "#A32515"], // theme 19
-    ["#EEE0CB", "#BAA898", "#848586", "#C2847A", "#3B1719"], // theme 20
+    //["#171C55", "#74A4BC", "#B6D6CC", "#F1FEC6", "#A32515"], // theme 19
+    //["#EEE0CB", "#BAA898", "#848586", "#C2847A", "#3B1719"], // theme 20
     ["#0FA3B1", "#777D75", "#EDDEA4", "#F7A072", "#FF9B42"], // theme 21
-    ["#4F4D53", "#D1C3B4", "#5A435B", "#A53860", "#47937B"], // theme 22
+    ["#4F4D53", "#5A435B", "#D1C3B4", "#A53860", "#47937B"], // theme 22
     ["#9D1C2D", "#B24628", "#2E294E", "#198C7F", "#B4C564"], // theme 23
     ["#387A84", "#99C8BE", "#DCE2C8", "#CC5600", "#F28A3C"], // theme 24
     ["#3A2E39", "#B03B3C", "#1E555C", "#875644", "#F1C6A4"], // theme 25
@@ -260,7 +260,7 @@ var playerName = "";
 var leaderboard = 0;
 
 function drawStats() {
-    sideContext.font = "bold " + (baseUnitSize / 2) + "px Helvetica";
+    sideContext.font = "bold " + (baseUnitSize / 1.5) + "px Helvetica";
     sideContext.fillStyle = "#555";
     sideContext.textAlign = "center";
     sideContext.fillText("Next Piece", sideCanvas.width / 2, baseUnitSize);
@@ -284,7 +284,7 @@ function drawLeaderboard() {
     if (leaderboard != 0) {
         for (let i = 0; i < leaderboard.length; i++) {
             context.font = baseUnitSize + "px Helvetica";
-            context.fillStyle = "SteelBlue";
+            context.fillStyle = colors[1];
             context.textAlign = "center";
             context.fillText("LEADERBOARD", (canvas.width / 2), baseUnitSize * 7);
             context.font = (baseUnitSize / 2) + "px Helvetica";

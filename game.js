@@ -266,6 +266,8 @@ var leaderboard = 0;
 var blocksAddedToken = 30;
 var speedIncreaseToken = 30;
 var rowComboToken = 30;
+var comboKingToken = 30;
+var gameStartToken = 0;
 
 function drawStats() {
     sideContext.font = "bold " + (baseUnitSize / 1.5) + "px Monaco";
@@ -293,22 +295,36 @@ function showNotifications() {
         context.textAlign = "center";
         context.fillStyle = colors[3];
         context.font = ((baseUnitSize / 2) + (baseUnitSize / 30 * blocksAddedToken)) + "px Monaco";
-        context.fillText("BLOCKS ADDED!", (canvas.width / 2), canvas.height / 2);
+        context.fillText("BLOCKS ADDED!", (canvas.width / 2), (canvas.height / 2) - (blocksAddedToken * baseUnitSize / 30));
         blocksAddedToken++;
     }
     if (speedIncreaseToken < 30) { // to be implemented...
         context.textAlign = "center";
         context.fillStyle = colors[3];
         context.font = ((baseUnitSize / 2) + (baseUnitSize / 30 * speedIncreaseToken)) + "px Monaco";
-        context.fillText("SPEED INCREASE!", (canvas.width / 2), canvas.height / 2);
+        context.fillText("SPEED INCREASE!", (canvas.width / 2), (canvas.height / 2) - (speedIncreaseToken * baseUnitSize / 30));
         speedIncreaseToken++;
     }
     if (rowComboToken < 30) {
         context.textAlign = "center";
         context.fillStyle = colors[3];
         context.font = ((baseUnitSize / 2) + (baseUnitSize / 30 * rowComboToken)) + "px Monaco";
-        context.fillText("COMBO!", (canvas.width / 2), canvas.height / 2);
+        context.fillText("COMBO!", (canvas.width / 2), (canvas.height / 2) - (rowComboToken * baseUnitSize / 30));
         rowComboToken++;
+    }
+    if (comboKingToken < 30) {
+        context.textAlign = "center";
+        context.fillStyle = colors[3];
+        context.font = ((baseUnitSize / 2) + (baseUnitSize / 30 * comboKingToken)) + "px Monaco";
+        context.fillText("COMBO KING!", (canvas.width / 2), (canvas.height / 2) - (comboKingToken * baseUnitSize / 30));
+        comboKingToken++;
+    }
+    if (gameStartToken < 60) {
+        context.textAlign = "center";
+        context.fillStyle = colors[3];
+        context.font = ((baseUnitSize / 2) + (baseUnitSize / 90 * gameStartToken)) + "px Monaco";
+        context.fillText("GAME START!", (canvas.width / 2), (canvas.height / 2) - (gameStartToken * baseUnitSize / 15));
+        gameStartToken++;
     }
 }
 
@@ -385,9 +401,13 @@ function givePoints(rowsCleared) {
     if (rowsCleared == 1) {
         playerScore += 10;
     }
-    else if (rowsCleared > 1) {
+    else if (rowsCleared > 1 && rowsCleared < 4) {
         playerScore += 20 * rowsCleared;
         rowComboToken = 0;
+    }
+    else if (rowsCleared > 3) {
+        playerScore += 20 * rowsCleared;
+        comboKingToken = 0;
     }
 }
 

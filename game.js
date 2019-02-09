@@ -174,7 +174,7 @@ var themes = [
     //["#FBF5F3", "#522B47", "#7B0828", "#7D7C84", "#0F0E0E"], // theme 2
     //["#FF715B", "#522B47", "#FFFFFF", "#7D7C84", "#1EA896"], // theme 3
     //["#F4E76E", "#F7FE72", "#8FF7A7", "#7D7C84", "#51BBFE"], // theme 4
-    ["#FFEEF2", "#FFE4F3", "#FFC8FB", "#7D7C84", "#FF92C2"], // theme 5 (pink theme)
+    ["#FFEEF2", "#FFE4F3", "#FFC8FB", "#7D7C84", "#FF92C2"], // theme 5 (pink theme) leaderboard text too light
     ["#3D5A80", "#98C1D9", "#E0FBFC", "#EE6C4D", "#293241"], // theme 6
     ["#D8A47F", "#EF8354", "#EE4B6A", "#DF3B57", "#0F7173"], // theme 7
     ["#725752", "#878E88", "#96C0B7", "#D4DFC7", "#FEF6C9"], // theme 8
@@ -263,11 +263,14 @@ window.onload = function() {
 var playerScore = 0;
 var playerName = "";
 var leaderboard = 0;
+
 var blocksAddedToken = 30;
 var speedIncreaseToken = 30;
 var rowComboToken = 30;
 var comboKingToken = 30;
 var gameStartToken = 0;
+var dangerWarningToken = 60;
+var gameOverSlideInToken = 0;
 
 function drawStats() {
     sideContext.font = "bold " + (baseUnitSize / 1.5) + "px Monaco";
@@ -294,7 +297,7 @@ function showNotifications() {
     if (blocksAddedToken < 30) {
         context.textAlign = "center";
         context.fillStyle = colors[3];
-        context.font = ((baseUnitSize / 2) + (baseUnitSize / 30 * blocksAddedToken)) + "px Monaco";
+        context.font = ((baseUnitSize / 2) + (baseUnitSize / 60 * blocksAddedToken)) + "px Monaco";
         context.fillText("BLOCKS ADDED!", (canvas.width / 2), (canvas.height * 0.75) - (blocksAddedToken * baseUnitSize / 30));
         blocksAddedToken++;
     }
@@ -326,6 +329,16 @@ function showNotifications() {
         context.fillText("GAME START!", (canvas.width / 2), (canvas.height / 2) - (gameStartToken * baseUnitSize / 15));
         gameStartToken++;
     }
+    let opacitySpectrum = ["00", "08", "10", "18", "20", "28", "30", "38", "40", "48", "50", "58", "60", "68", "70", "78", "80", "88", "90", "98", "A0", "A8", "B0", "B8", "C0", "C8", "D0", "D8", "E0", "E8", "F0", "F8", "FF"];
+    if (dangerWarningToken == 0) {
+        canvas.style.backgroundColor = "#EEE";
+        dangerWarningToken++;
+        return;
+    }
+    else if (dangerWarningToken < 60 && dangerWarningToken > 0) {
+        canvas.style.backgroundColor = "#EEEEEE" + opacitySpectrum[Math.round(dangerWarningToken/(60/opacitySpectrum.length))];
+        dangerWarningToken++;
+    }
 }
 
 function drawLeaderboard() {
@@ -334,9 +347,9 @@ function drawLeaderboard() {
             context.font = baseUnitSize + "px Monaco";
             context.fillStyle = colors[1];
             context.textAlign = "center";
-            context.fillText("LEADERBOARD", (canvas.width / 2), baseUnitSize * 9);
+            context.fillText("LEADERBOARD", (canvas.width / 2), (baseUnitSize * 540 / gameOverSlideInToken));
             context.font = (baseUnitSize / 2) + "px Monaco";
-            context.fillText((leaderboard[i].name + ": " + leaderboard[i].score), (canvas.width / 2), (baseUnitSize * 10) + (i * baseUnitSize));
+            context.fillText((leaderboard[i].name + ": " + leaderboard[i].score), (canvas.width / 2), ((baseUnitSize * 600 / gameOverSlideInToken) + (i * baseUnitSize)));
         }
     }
     else if (leaderboard == 0) {
@@ -351,9 +364,12 @@ function drawGameOver() {
     context.textAlign = "center";
     context.fillStyle = "#555";
     context.font = baseUnitSize + "px Monaco";
-    context.fillText("GAME OVER", (canvas.width / 2), baseUnitSize * 6);
+    context.fillText("GAME OVER", canvas.width - ((canvas.width * 30) / gameOverSlideInToken), baseUnitSize * 6);
     context.font = (baseUnitSize / 2) + "px Monaco";
-    context.fillText("Reload page to play again", (canvas.width / 2), baseUnitSize * 7);
+    context.fillText("Reload page to play again", ((canvas.width * 30) / gameOverSlideInToken), baseUnitSize * 7);
+    if (gameOverSlideInToken < 60) {
+        gameOverSlideInToken++;
+    }
 }
 
 function animateBlocksUp() {
@@ -415,6 +431,7 @@ function checkLoss() {
     for (i = 0; i < 4; i++) {
         if (gamePiece.template[i][1] <= 0) {
             // Game over!
+            dangerWarningToken = 0;
             gameState = -99;
             if (serverStatus.status == "Online") {
                 getLeaderboard();
@@ -782,6 +799,9 @@ function saveToFallen() {
     for (let i = 0; i < 4; i++) {
         gamePiece.template[i].push(gamePiece.color);
         fallenPieces.push(gamePiece.template[i]);
+        if (gamePiece.template[i][1] < 4 * baseUnitSize && dangerWarningToken == 60) {
+            dangerWarningToken = 0;
+        }
     }
 }
 

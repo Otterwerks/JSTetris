@@ -185,12 +185,12 @@ var themes = [
     ["#012622", "#003B36", "#6C696E", "#E98A15", "#59114D"], // theme 13
     ["#DD6E42", "#E8DAB2", "#4F6D7A", "#C0D6DF", "#808080"], // theme 14
     ["#BEE9E8", "#62B6CB", "#1B4965", "#A6BFD1", "#5FA8D3"], // theme 15 blue theme)
-    ["#FFB997", "#F67E7D", "#843B62", "#211940", "#74546A"], // theme 16
+    ["#FFB997", "#F67E7D", "#843B62", "#211940", "#74546A"], // theme 16 (sunset theme)
     //["#FAA916", "#FBFFFE", "#6D676E", "#2F2F32", "#96031A"], // theme 17 ([1] is white)
     ["#BFB1CC", "#6C6E6C", "#60495A", "#3F3244", "#2F2235"], // theme 18
     //["#171C55", "#74A4BC", "#B6D6CC", "#F1FEC6", "#A32515"], // theme 19
     //["#EEE0CB", "#BAA898", "#848586", "#C2847A", "#3B1719"], // theme 20
-    ["#0FA3B1", "#777D75", "#EDDEA4", "#F7A072", "#FF9B42"], // theme 21
+    ["#0FA3B1", "#777D75", "#EDDEA4", "#F7A072", "#FF9B42"], // theme 21 (beach theme)
     ["#4F4D53", "#5A435B", "#D1C3B4", "#A53860", "#47937B"], // theme 22
     ["#9D1C2D", "#B24628", "#2E294E", "#198C7F", "#B4C564"], // theme 23
     ["#387A84", "#99C8BE", "#DCE2C8", "#CC5600", "#F28A3C"], // theme 24
@@ -238,6 +238,7 @@ window.onload = function() {
             drawNextPiece();
             drawFallenPieces();
             drawStats();
+            showNotifications();
         }
         else if (gameState == 0) {
             context.clearRect(0, 0, canvas.width, canvas.height);
@@ -262,10 +263,13 @@ window.onload = function() {
 var playerScore = 0;
 var playerName = "";
 var leaderboard = 0;
+var blocksAddedToken = 30;
+var speedIncreaseToken = 30;
+var rowComboToken = 30;
 
 function drawStats() {
     sideContext.font = "bold " + (baseUnitSize / 1.5) + "px Monaco";
-    sideContext.fillStyle = "#333";
+    sideContext.fillStyle = "#555";
     sideContext.textAlign = "center";
     sideContext.fillText("NEXT PIECE", sideCanvas.width / 2, baseUnitSize);
     sideContext.fillText("GAME STATS", sideCanvas.width / 2, baseUnitSize * 8);
@@ -282,6 +286,30 @@ function drawStats() {
     sideContext.font = (baseUnitSize / 2) + "px Monaco";
     sideContext.fillStyle = serverStatus.color;
     sideContext.fillText(serverStatus.status, sideCanvas.width / 2, baseUnitSize * 19);
+}
+
+function showNotifications() {
+    if (blocksAddedToken < 30) {
+        context.textAlign = "center";
+        context.fillStyle = colors[3];
+        context.font = ((baseUnitSize / 2) + (baseUnitSize / 30 * blocksAddedToken)) + "px Monaco";
+        context.fillText("BLOCKS ADDED!", (canvas.width / 2), canvas.height / 2);
+        blocksAddedToken++;
+    }
+    if (speedIncreaseToken < 30) { // to be implemented...
+        context.textAlign = "center";
+        context.fillStyle = colors[3];
+        context.font = ((baseUnitSize / 2) + (baseUnitSize / 30 * speedIncreaseToken)) + "px Monaco";
+        context.fillText("SPEED INCREASE!", (canvas.width / 2), canvas.height / 2);
+        speedIncreaseToken++;
+    }
+    if (rowComboToken < 30) {
+        context.textAlign = "center";
+        context.fillStyle = colors[3];
+        context.font = ((baseUnitSize / 2) + (baseUnitSize / 30 * rowComboToken)) + "px Monaco";
+        context.fillText("COMBO!", (canvas.width / 2), canvas.height / 2);
+        rowComboToken++;
+    }
 }
 
 function drawLeaderboard() {
@@ -309,7 +337,7 @@ function drawGameOver() {
     context.font = baseUnitSize + "px Monaco";
     context.fillText("GAME OVER", (canvas.width / 2), baseUnitSize * 6);
     context.font = (baseUnitSize / 2) + "px Monaco";
-    context.fillText("Refresh page to play again", (canvas.width / 2), baseUnitSize * 7);
+    context.fillText("Reload page to play again", (canvas.width / 2), baseUnitSize * 7);
 }
 
 function animateBlocksUp() {
@@ -357,8 +385,9 @@ function givePoints(rowsCleared) {
     if (rowsCleared == 1) {
         playerScore += 10;
     }
-    else {
+    else if (rowsCleared > 1) {
         playerScore += 20 * rowsCleared;
+        rowComboToken = 0;
     }
 }
 
@@ -421,6 +450,7 @@ function setDifficulty() {
             challengeRows = 3;
         }
         createChallengeRow(challengeRows);
+        blocksAddedToken = 0;
     }
     fallSpeed = Math.floor(playerScore / 100) + 1;
 }

@@ -171,7 +171,7 @@ var gridColor = "#AAA";
 
 var themes = [
     //["#ED6A5A", "#9BC1BC", "#F4F1BB", "#7D7C84", "#E6EBE0"], // theme 1 ([4] is too light)
-    //["#FBF5F3", "#522B47", "#7B0828", "#7D7C84", "#0F0E0E"], // theme 2
+    //["#FBF5F3", "#522B47", "#7B0828", "#7D7C84", "#0F0E0E"], // theme 2 ++
     //["#FF715B", "#522B47", "#FFFFFF", "#7D7C84", "#1EA896"], // theme 3
     //["#F4E76E", "#F7FE72", "#8FF7A7", "#7D7C84", "#51BBFE"], // theme 4
     ["#FFEEF2", "#FFE4F3", "#FFC8FB", "#7D7C84", "#FF92C2"], // theme 5 (pink theme) leaderboard text too light
@@ -299,6 +299,9 @@ function showNotifications() {
         context.fillStyle = colors[3];
         context.font = ((baseUnitSize / 2) + (baseUnitSize / 60 * blocksAddedToken)) + "px Monaco";
         context.fillText("BLOCKS ADDED!", (canvas.width / 2), (canvas.height * 0.75) - (blocksAddedToken * baseUnitSize / 30));
+        context.lineWidth = baseUnitSize / 100;
+        context.strokeStyle = "#000";
+        context.strokeText("BLOCKS ADDED!", (canvas.width / 2), (canvas.height * 0.75) - (blocksAddedToken * baseUnitSize / 30));
         blocksAddedToken++;
     }
     if (speedIncreaseToken < 30) {
@@ -306,6 +309,9 @@ function showNotifications() {
         context.fillStyle = colors[3];
         context.font = ((baseUnitSize / 2) + (baseUnitSize / 30 * speedIncreaseToken)) + "px Monaco";
         context.fillText("SPEED INCREASE!", (canvas.width / 2), (canvas.height * 0.25) + (speedIncreaseToken * baseUnitSize / 30));
+        context.lineWidth = baseUnitSize / 100;
+        context.strokeStyle = "#000";
+        context.strokeText("SPEED INCREASE!", (canvas.width / 2), (canvas.height * 0.25) + (speedIncreaseToken * baseUnitSize / 30));
         speedIncreaseToken++;
     }
     if (rowComboToken < 30) {
@@ -313,6 +319,9 @@ function showNotifications() {
         context.fillStyle = colors[3];
         context.font = ((baseUnitSize / 2) + (baseUnitSize / 30 * rowComboToken)) + "px Monaco";
         context.fillText("COMBO!", (canvas.width / 2), (canvas.height / 2) - (rowComboToken * baseUnitSize / 30));
+        context.lineWidth = baseUnitSize / 100;
+        context.strokeStyle = "#000";
+        context.strokeText("COMBO!", (canvas.width / 2), (canvas.height / 2) - (rowComboToken * baseUnitSize / 30));
         rowComboToken++;
     }
     if (comboKingToken < 30) {
@@ -320,6 +329,9 @@ function showNotifications() {
         context.fillStyle = colors[3];
         context.font = ((baseUnitSize / 2) + (baseUnitSize / 30 * comboKingToken)) + "px Monaco";
         context.fillText("SUPER COMBO!", (canvas.width / 2), (canvas.height / 2) - (comboKingToken * baseUnitSize / 30));
+        context.lineWidth = baseUnitSize / 100;
+        context.strokeStyle = "#000";
+        context.strokeText("SUPER COMBO!", (canvas.width / 2), (canvas.height / 2) - (comboKingToken * baseUnitSize / 30));
         comboKingToken++;
     }
     if (gameStartToken < 60) {
@@ -327,6 +339,9 @@ function showNotifications() {
         context.fillStyle = colors[3];
         context.font = ((baseUnitSize / 2) + (baseUnitSize / 90 * gameStartToken)) + "px Monaco";
         context.fillText("GAME START!", (canvas.width / 2), (canvas.height / 2) - (gameStartToken * baseUnitSize / 15));
+        context.lineWidth = baseUnitSize / 100;
+        context.strokeStyle = "#000";
+        context.strokeText("GAME START!", (canvas.width / 2), (canvas.height / 2) - (gameStartToken * baseUnitSize / 15));
         gameStartToken++;
     }
     let opacitySpectrum = ["00", "08", "10", "18", "20", "28", "30", "38", "40", "48", "50", "58", "60", "68", "70", "78", "80", "88", "90", "98", "A0", "A8", "B0", "B8", "C0", "C8", "D0", "D8", "E0", "E8", "F0", "F8", "FF"];

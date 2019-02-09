@@ -156,8 +156,8 @@ function drawFrame() {
     sideContext.stroke();
 
     sideContext.beginPath();
-    sideContext.moveTo(0, baseUnitSize * 7 - (sideBarSlideUpToken / 8.5 * baseUnitSize));
-    sideContext.lineTo(sideCanvas.width, baseUnitSize * 7 - (sideBarSlideUpToken / 8.5 * baseUnitSize));
+    sideContext.moveTo(0, baseUnitSize * 7 - (sideBarSlideUpToken / 8.5 * baseUnitSize * 70 / (sideBarSlideUpToken + 10)));
+    sideContext.lineTo(sideCanvas.width, baseUnitSize * 7 - (sideBarSlideUpToken / 8.5 * baseUnitSize * 70 / (sideBarSlideUpToken + 10)));
     sideContext.moveTo(0, baseUnitSize * 17);
     sideContext.lineTo(sideCanvas.width, baseUnitSize * 17);
     sideContext.lineWidth = baseUnitSize / 10;
@@ -287,14 +287,14 @@ function drawStats() {
     if (gameState != 0) {
         sideContext.fillText("NEXT PIECE", sideCanvas.width / 2, baseUnitSize);
     }
-    sideContext.fillText("GAME STATS", sideCanvas.width / 2, (baseUnitSize * 8) - (sideBarSlideUpToken / 8.5 * baseUnitSize));
+    sideContext.fillText("GAME STATS", sideCanvas.width / 2, (baseUnitSize * 8) - (sideBarSlideUpToken / 8.5 * baseUnitSize * 70 / (sideBarSlideUpToken + 10)));
     sideContext.font = (baseUnitSize / 2) + "px Monaco";
     sideContext.textAlign = "left";
-    sideContext.fillText("Score: " + playerScore, baseUnitSize / 2, (baseUnitSize * 9) - (sideBarSlideUpToken / 8.5 * baseUnitSize));
-    sideContext.fillText("Rows Cleared: " + totalRowsCleared, baseUnitSize / 2, baseUnitSize * 10 - (sideBarSlideUpToken / 8.5 * baseUnitSize));
-    sideContext.fillText("Round: " + gamePlayRounds, baseUnitSize / 2, (baseUnitSize * 11) - (sideBarSlideUpToken / 8.5 * baseUnitSize));
-    sideContext.fillText("Speed: " + fallSpeed, baseUnitSize / 2, (baseUnitSize * 12) - (sideBarSlideUpToken / 8.5 * baseUnitSize));
-    sideContext.fillText("Theme: " + activeTheme, baseUnitSize / 2, (baseUnitSize * 13) - (sideBarSlideUpToken / 8.5 * baseUnitSize));
+    sideContext.fillText("Score: " + playerScore, baseUnitSize / 2, (baseUnitSize * 9) - (sideBarSlideUpToken / 8.5 * baseUnitSize * 70 / (sideBarSlideUpToken + 10)));
+    sideContext.fillText("Rows Cleared: " + totalRowsCleared, baseUnitSize / 2, baseUnitSize * 10 - (sideBarSlideUpToken / 8.5 * baseUnitSize * 70 / (sideBarSlideUpToken + 10)));
+    sideContext.fillText("Round: " + gamePlayRounds, baseUnitSize / 2, (baseUnitSize * 11) - (sideBarSlideUpToken / 8.5 * baseUnitSize * 70 / (sideBarSlideUpToken + 10)));
+    sideContext.fillText("Speed: " + fallSpeed, baseUnitSize / 2, (baseUnitSize * 12) - (sideBarSlideUpToken / 8.5 * baseUnitSize * 70 / (sideBarSlideUpToken + 10)));
+    sideContext.fillText("Theme: " + activeTheme, baseUnitSize / 2, (baseUnitSize * 13) - (sideBarSlideUpToken / 8.5 * baseUnitSize * 70 / (sideBarSlideUpToken + 10)));
     sideContext.font = "bold " + (baseUnitSize / 2) + "px Monaco";
     sideContext.textAlign = "center";
     sideContext.fillText("SERVER STATUS", sideCanvas.width / 2, baseUnitSize * 18);

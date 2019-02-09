@@ -36,7 +36,7 @@ function setSize() {
     sideCanvas.width = baseUnitSize * 6;
     sideCanvas.height = canvas.height;
     sideCanvas.style.position = "absolute";
-    sideCanvas.style.left = (gameOffset + canvas.width) + "px";
+    sideCanvas.style.left = ((gameOffset + canvas.width) * 1.01) + "px";
     sideCanvas.style.top = baseUnitSize + "px";
 
     futurePiece.xPosition = 2 * baseUnitSize;
@@ -50,6 +50,7 @@ function initializeLayout() {
     canvas.style.borderTopLeftRadius = (baseUnitSize / 4) + "px";
     canvas.style.borderBottomLeftRadius = (baseUnitSize / 4) + "px";
     canvas.style.borderWidth = (baseUnitSize / 4) + "px";
+    canvas.style.borderRightWidth = "0px";
     canvas.style.borderTopStyle = "solid";
     canvas.style.borderLeftStyle = "solid";
     canvas.style.borderRightStyle = "none";
@@ -59,6 +60,7 @@ function initializeLayout() {
     sideCanvas.style.borderTopRightRadius = (baseUnitSize / 4) + "px";
     sideCanvas.style.borderBottomRightRadius = (baseUnitSize / 4) + "px";
     sideCanvas.style.borderWidth = (baseUnitSize / 4) + "px";
+    sideCanvas.style.borderLeftWidth = "0px";
     sideCanvas.style.borderTopStyle = "solid";
     sideCanvas.style.borderLeftStyle = "none";
     sideCanvas.style.borderRightStyle = "solid";
@@ -152,8 +154,8 @@ function drawFrame() {
     sideContext.stroke();
 
     sideContext.beginPath();
-    sideContext.moveTo(0, baseUnitSize * 7);
-    sideContext.lineTo(sideCanvas.width, baseUnitSize * 7);
+    sideContext.moveTo(0, baseUnitSize * 7 - (sideBarSlideUpToken / 8.5 * baseUnitSize));
+    sideContext.lineTo(sideCanvas.width, baseUnitSize * 7 - (sideBarSlideUpToken / 8.5 * baseUnitSize));
     sideContext.moveTo(0, baseUnitSize * 17);
     sideContext.lineTo(sideCanvas.width, baseUnitSize * 17);
     sideContext.lineWidth = baseUnitSize / 10;
@@ -190,7 +192,7 @@ var themes = [
     ["#BFB1CC", "#6C6E6C", "#60495A", "#3F3244", "#2F2235"], // theme 18
     //["#171C55", "#74A4BC", "#B6D6CC", "#F1FEC6", "#A32515"], // theme 19
     //["#EEE0CB", "#BAA898", "#848586", "#C2847A", "#3B1719"], // theme 20
-    ["#0FA3B1", "#777D75", "#EDDEA4", "#F7A072", "#FF9B42"], // theme 21 (beach theme)
+    ["#0FA3B1", "#777D75", "#EDDEA4", "#F7A072", "#FF9B42"], // theme 21 (beach theme) ++
     ["#4F4D53", "#5A435B", "#D1C3B4", "#A53860", "#47937B"], // theme 22
     ["#9D1C2D", "#B24628", "#2E294E", "#198C7F", "#B4C564"], // theme 23
     ["#387A84", "#99C8BE", "#DCE2C8", "#CC5600", "#F28A3C"], // theme 24
@@ -247,6 +249,9 @@ window.onload = function() {
             drawFrame();
             drawGameOver();
             drawLeaderboard();
+            if (sideBarSlideUpToken < 60) {
+                sideBarSlideUpToken++;
+            }
         }
         else if (gameState == -1) {
             if (leaderboard != 0 && serverStatus.status == "Online") {
@@ -271,20 +276,23 @@ var comboKingToken = 30;
 var gameStartToken = 0;
 var dangerWarningToken = 60;
 var gameOverSlideInToken = 0;
+var sideBarSlideUpToken = 0;
 
 function drawStats() {
     sideContext.font = "bold " + (baseUnitSize / 1.5) + "px Monaco";
     sideContext.fillStyle = "#555";
     sideContext.textAlign = "center";
-    sideContext.fillText("NEXT PIECE", sideCanvas.width / 2, baseUnitSize);
-    sideContext.fillText("GAME STATS", sideCanvas.width / 2, baseUnitSize * 8);
+    if (gameState != 0) {
+        sideContext.fillText("NEXT PIECE", sideCanvas.width / 2, baseUnitSize);
+    }
+    sideContext.fillText("GAME STATS", sideCanvas.width / 2, (baseUnitSize * 8) - (sideBarSlideUpToken / 8.5 * baseUnitSize));
     sideContext.font = (baseUnitSize / 2) + "px Monaco";
     sideContext.textAlign = "left";
-    sideContext.fillText("Score: " + playerScore, baseUnitSize / 2, baseUnitSize * 9);
-    sideContext.fillText("Rows Cleared: " + totalRowsCleared, baseUnitSize / 2, baseUnitSize * 10);
-    sideContext.fillText("Round: " + gamePlayRounds, baseUnitSize / 2, baseUnitSize * 11);
-    sideContext.fillText("Speed: " + fallSpeed, baseUnitSize / 2, baseUnitSize * 12);
-    sideContext.fillText("Theme: " + activeTheme, baseUnitSize / 2, baseUnitSize * 13);
+    sideContext.fillText("Score: " + playerScore, baseUnitSize / 2, (baseUnitSize * 9) - (sideBarSlideUpToken / 8.5 * baseUnitSize));
+    sideContext.fillText("Rows Cleared: " + totalRowsCleared, baseUnitSize / 2, baseUnitSize * 10 - (sideBarSlideUpToken / 8.5 * baseUnitSize));
+    sideContext.fillText("Round: " + gamePlayRounds, baseUnitSize / 2, (baseUnitSize * 11) - (sideBarSlideUpToken / 8.5 * baseUnitSize));
+    sideContext.fillText("Speed: " + fallSpeed, baseUnitSize / 2, (baseUnitSize * 12) - (sideBarSlideUpToken / 8.5 * baseUnitSize));
+    sideContext.fillText("Theme: " + activeTheme, baseUnitSize / 2, (baseUnitSize * 13) - (sideBarSlideUpToken / 8.5 * baseUnitSize));
     sideContext.font = "bold " + (baseUnitSize / 2) + "px Monaco";
     sideContext.textAlign = "center";
     sideContext.fillText("SERVER STATUS", sideCanvas.width / 2, baseUnitSize * 18);
@@ -363,15 +371,21 @@ function drawLeaderboard() {
             context.fillStyle = colors[1];
             context.textAlign = "center";
             context.fillText("LEADERBOARD", (canvas.width / 2), (baseUnitSize * 540 / gameOverSlideInToken));
+            context.lineWidth = baseUnitSize / 100;
+            context.strokeStyle = "#000";
+            context.strokeText("LEADERBOARD", (canvas.width / 2), (baseUnitSize * 540 / gameOverSlideInToken));
             context.font = (baseUnitSize / 2) + "px Monaco";
             context.fillText((leaderboard[i].name + ": " + leaderboard[i].score), (canvas.width / 2), ((baseUnitSize * 600 / gameOverSlideInToken) + (i * baseUnitSize)));
+            context.lineWidth = baseUnitSize / 100;
+            context.strokeStyle = "#000";
+            context.strokeText((leaderboard[i].name + ": " + leaderboard[i].score), (canvas.width / 2), ((baseUnitSize * 600 / gameOverSlideInToken) + (i * baseUnitSize)));
         }
     }
     else if (leaderboard == 0) {
         context.font = (baseUnitSize / 2) + "px Monaco";
         context.fillStyle = "SteelBlue";
         context.textAlign = "center";
-        context.fillText("Leaderboard Unavailable...", (canvas.width / 2), baseUnitSize * 6);
+        context.fillText("Leaderboard Unavailable...", (canvas.width / 2), baseUnitSize * 600 / gameOverSlideInToken);
     }
 }
 
@@ -395,7 +409,8 @@ function animateBlocksUp() {
             t += 10;
         }
     }
-    setTimeout(function() {canvas.style.backgroundImage = "linear-gradient(" + colors[2] + " 0, #EEE 20%, #EEE 80%," + colors[2] + " 100%)";}, t);
+    //setTimeout(function() {canvas.style.backgroundImage = "linear-gradient(" + colors[2] + " 0, #EEE 20%, #EEE 80%," + colors[2] + " 100%)";}, t);
+    setTimeout(function() {canvas.style.backgroundColor = "#FFFFFFAA";}, t);
     animateBlocksDown(t);
 }
 

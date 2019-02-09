@@ -30,13 +30,13 @@ function setSize() {
     canvas.height = baseUnitSize * height;
     canvas.style.position = "absolute";
     canvas.style.left = gameOffset + "px";
-    canvas.style.top = "0px";
+    canvas.style.top = baseUnitSize + "px";
 
     sideCanvas.width = baseUnitSize * 6;
     sideCanvas.height = canvas.height;
     sideCanvas.style.position = "absolute";
     sideCanvas.style.left = (gameOffset + canvas.width) + "px";
-    sideCanvas.style.top = "0px";
+    sideCanvas.style.top = baseUnitSize + "px";
 
     futurePiece.xPosition = 2 * baseUnitSize;
     futurePiece.yPosition = 2 * baseUnitSize;
@@ -108,6 +108,38 @@ function drawGrid() {
         context.strokeStyle = gridColor;
         context.stroke();
     }
+    
+}
+
+function drawFrame() {
+    context.beginPath();
+    context.moveTo(0, 0);
+    context.lineTo(canvas.width, 0);
+    context.lineTo(canvas.width, canvas.height);
+    context.lineTo(0, canvas.height);
+    context.lineTo(0, 0);
+    context.lineWidth = baseUnitSize / 10;
+    context.strokeStyle = "black";
+    context.stroke();
+
+    sideContext.beginPath();
+    sideContext.moveTo(0, 0);
+    sideContext.lineTo(sideCanvas.width, 0);
+    sideContext.lineTo(sideCanvas.width, sideCanvas.height);
+    sideContext.lineTo(0, sideCanvas.height);
+    sideContext.lineTo(0, 0);
+    sideContext.lineWidth = baseUnitSize / 10;
+    sideContext.strokeStyle = "black";
+    sideContext.stroke();
+
+    sideContext.beginPath();
+    sideContext.moveTo(0, baseUnitSize * 6);
+    sideContext.lineTo(sideCanvas.width, baseUnitSize * 6);
+    sideContext.moveTo(0, baseUnitSize * 14);
+    sideContext.lineTo(sideCanvas.width, baseUnitSize * 14);
+    sideContext.lineWidth = baseUnitSize / 10;
+    sideContext.strokeStyle = "black";
+    sideContext.stroke();
 }
 
 
@@ -181,6 +213,7 @@ window.onload = function() {
             detectCollision();
             gravity();
             drawGrid();
+            drawFrame();
             drawGamePiece();
             drawShadowPiece();
             drawNextPiece();
@@ -191,6 +224,7 @@ window.onload = function() {
             context.clearRect(0, 0, canvas.width, canvas.height);
             sideContext.clearRect(0, 0, sideCanvas.width, sideCanvas.height);
             drawStats();
+            drawFrame();
             drawGameOver();
             drawLeaderboard();
         }
@@ -211,21 +245,24 @@ var playerName = "";
 var leaderboard = 0;
 
 function drawStats() {
-    sideContext.font = (baseUnitSize / 2) + "px Helvetica";
+    sideContext.font = "bold " + (baseUnitSize / 2) + "px Helvetica";
     sideContext.fillStyle = "#555";
     sideContext.textAlign = "center";
-    sideContext.fillText("Next Piece:", baseUnitSize * 3, baseUnitSize / 1.5);
-    sideContext.fillText("Game Stats", baseUnitSize * 3, baseUnitSize * 6);
+    sideContext.fillText("Next Piece", sideCanvas.width / 2, baseUnitSize / 1.5);
+    sideContext.fillText("Game Stats", sideCanvas.width / 2, baseUnitSize * 7);
+    sideContext.font = (baseUnitSize / 2) + "px Helvetica";
     sideContext.textAlign = "left";
-    sideContext.fillText("Score: " + playerScore, baseUnitSize, baseUnitSize * 7);
-    sideContext.fillText("Rows Cleared: " + totalRowsCleared, baseUnitSize, baseUnitSize * 8);
-    sideContext.fillText("Round: " + gamePlayRounds, baseUnitSize, baseUnitSize * 9);
-    sideContext.fillText("Speed: " + fallSpeed, baseUnitSize, baseUnitSize * 10)
-    sideContext.fillText("Theme: " + activeTheme, baseUnitSize, baseUnitSize * 11);
-    sideContext.fillText("Server Status:", baseUnitSize, baseUnitSize * 12);
+    sideContext.fillText("Score: " + playerScore, baseUnitSize, baseUnitSize * 8);
+    sideContext.fillText("Rows Cleared: " + totalRowsCleared, baseUnitSize, baseUnitSize * 9);
+    sideContext.fillText("Round: " + gamePlayRounds, baseUnitSize, baseUnitSize * 10);
+    sideContext.fillText("Speed: " + fallSpeed, baseUnitSize, baseUnitSize * 11);
+    sideContext.fillText("Theme: " + activeTheme, baseUnitSize, baseUnitSize * 12);
+    sideContext.font = "bold " + (baseUnitSize / 2) + "px Helvetica";
     sideContext.textAlign = "center";
+    sideContext.fillText("Server Status", sideCanvas.width / 2, baseUnitSize * 15);
+    sideContext.font = (baseUnitSize / 2) + "px Helvetica";
     sideContext.fillStyle = serverStatus.color;
-    sideContext.fillText(serverStatus.status, baseUnitSize * 3, baseUnitSize * 13);
+    sideContext.fillText(serverStatus.status, sideCanvas.width / 2, baseUnitSize * 16);
 }
 
 function drawLeaderboard() {
@@ -251,7 +288,6 @@ function drawGameOver() {
     context.fillStyle = "#555";
     context.textAlign = "center";
     context.fillText("GAME OVER", (canvas.width / 2), (canvas.height / 4));
-    context.fillText(totalRowsCleared + " row(s) cleared.", (canvas.width / 2), (canvas.height / 4) + baseUnitSize);
     context.fillText("Refresh page to play again", (canvas.width / 2), (canvas.height / 4) + 2 * baseUnitSize);
 }
 
@@ -291,6 +327,7 @@ function animateBlocksDown(t) {
 function downCallBack(j, i){
     return function() {
         context.clearRect(j, i, baseUnitSize, baseUnitSize);
+        drawFrame();
     }
 }
 
@@ -446,7 +483,7 @@ function newGamePiece() {
     gamePiece.type = futurePiece.type;
     gamePiece.color = futurePiece.color;
     gamePiece.updateTemplate();
-    gamePlayRounds ++;
+    gamePlayRounds++;
 }
 
 function gamePieceShadow() {
@@ -758,21 +795,21 @@ var serverStatus = {status: "Unknown", color: "darkgrey"};
 function checkServerStatus() {
     let xhr = new XMLHttpRequest();
     xhr.open("GET", "https://otterwerks.net:2222/status", true);
-    xhr.onload = function () {
+    xhr.onload = function() {   
         if (xhr.readyState === xhr.DONE && 
             xhr.status === 200) {
                 serverStatus.status = "Online";
                 serverStatus.color = "green";
                 return;
         }
-        else {
-            serverStatus.status = "Offline";
-            serverStatus.color = "red";
-            return;
-        }
-    };   
+    };
+    xhr.onerror = function() {
+        serverStatus.status = "Offline";
+        serverStatus.color = "red";
+    }
     xhr.send();
 }
+
 
 function checkNewHighScore() {
     if (leaderboard != 0) {

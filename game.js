@@ -29,14 +29,16 @@ function setSize() {
 
     canvas.width = baseUnitSize * width;
     canvas.height = baseUnitSize * height;
+    canvas.style.paddingRight = "0px";
     canvas.style.position = "absolute";
     canvas.style.left = gameOffset + "px";
     canvas.style.top = baseUnitSize + "px";
 
     sideCanvas.width = baseUnitSize * 6;
     sideCanvas.height = canvas.height;
+    sideCanvas.style.paddingLeft = "0px";
     sideCanvas.style.position = "absolute";
-    sideCanvas.style.left = ((gameOffset + canvas.width) * 1.01) + "px";
+    sideCanvas.style.left = ((gameOffset + canvas.width) + (baseUnitSize / 4))  + "px";
     sideCanvas.style.top = baseUnitSize + "px";
 
     futurePiece.xPosition = 2 * baseUnitSize;
@@ -50,19 +52,19 @@ function initializeLayout() {
     canvas.style.borderTopLeftRadius = (baseUnitSize / 4) + "px";
     canvas.style.borderBottomLeftRadius = (baseUnitSize / 4) + "px";
     canvas.style.borderWidth = (baseUnitSize / 4) + "px";
-    canvas.style.borderRightWidth = "0px";
+    canvas.style.borderRightWidth = (baseUnitSize / 8) + "px";
     canvas.style.borderTopStyle = "solid";
     canvas.style.borderLeftStyle = "solid";
-    canvas.style.borderRightStyle = "none";
+    canvas.style.borderRightStyle = "solid";
     canvas.style.borderBottomStyle = "solid";
     sideCanvas.style.display = "block";
     sideCanvas.style.backgroundColor = "#FFFFFFAA";
     sideCanvas.style.borderTopRightRadius = (baseUnitSize / 4) + "px";
     sideCanvas.style.borderBottomRightRadius = (baseUnitSize / 4) + "px";
     sideCanvas.style.borderWidth = (baseUnitSize / 4) + "px";
-    sideCanvas.style.borderLeftWidth = "0px";
+    sideCanvas.style.borderLeftWidth = (baseUnitSize / 8) + "px";
     sideCanvas.style.borderTopStyle = "solid";
-    sideCanvas.style.borderLeftStyle = "none";
+    sideCanvas.style.borderLeftStyle = "solid";
     sideCanvas.style.borderRightStyle = "solid";
     sideCanvas.style.borderBottomStyle = "solid";
     main.style.backgroundColor = colors[0];

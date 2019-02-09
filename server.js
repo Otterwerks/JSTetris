@@ -17,15 +17,21 @@ leaderBoard.use('/folder', express.static('static'));
 
 leaderBoard.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Methods", "OPTIOns, POST");
+  res.header("Access-Control-Allow-Methods", "OPTIONS, POST, GET");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   res.header("Content-Type", "application/json; charset=UTF-8");
   next();
 });
 
+leaderBoard.get("/status", function(req, res, next) {
+	console.log("Status check from: " + req.connection.remoteAddress);
+	res.send({success:true});
+});
+
 leaderBoard.post("/submitScore", function(req, res, next) {
 	console.log("Score submitted");
 	console.log(req.body);
+	console.log("From: " + req.connection.remoteAddress);
 	if(!req.body.name || !req.body.score) {
 		res.send({error:"No name or score submitted"});
 		return;
@@ -44,7 +50,7 @@ leaderBoard.post("/submitScore", function(req, res, next) {
 });
 
 leaderBoard.post("/leaderboard", function(req, res, next) {
-	console.log("Leaderboard requested");
+	console.log("Leaderboard requested from: " + req.connection.remoteAddress);
 	leaderBoard.db.scores.find({}, {_id:0}).sort({score:-1}).limit(5, function(err, result) {
 		if (err) {
 			console.log("Failed to load scores: " + err);

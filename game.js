@@ -295,14 +295,14 @@ function showNotifications() {
         context.textAlign = "center";
         context.fillStyle = colors[3];
         context.font = ((baseUnitSize / 2) + (baseUnitSize / 30 * blocksAddedToken)) + "px Monaco";
-        context.fillText("BLOCKS ADDED!", (canvas.width / 2), (canvas.height / 2) - (blocksAddedToken * baseUnitSize / 30));
+        context.fillText("BLOCKS ADDED!", (canvas.width / 2), (canvas.height * 0.75) - (blocksAddedToken * baseUnitSize / 30));
         blocksAddedToken++;
     }
-    if (speedIncreaseToken < 30) { // to be implemented...
+    if (speedIncreaseToken < 30) {
         context.textAlign = "center";
         context.fillStyle = colors[3];
         context.font = ((baseUnitSize / 2) + (baseUnitSize / 30 * speedIncreaseToken)) + "px Monaco";
-        context.fillText("SPEED INCREASE!", (canvas.width / 2), (canvas.height / 2) - (speedIncreaseToken * baseUnitSize / 30));
+        context.fillText("SPEED INCREASE!", (canvas.width / 2), (canvas.height * 0.25) + (speedIncreaseToken * baseUnitSize / 30));
         speedIncreaseToken++;
     }
     if (rowComboToken < 30) {
@@ -316,7 +316,7 @@ function showNotifications() {
         context.textAlign = "center";
         context.fillStyle = colors[3];
         context.font = ((baseUnitSize / 2) + (baseUnitSize / 30 * comboKingToken)) + "px Monaco";
-        context.fillText("COMBO KING!", (canvas.width / 2), (canvas.height / 2) - (comboKingToken * baseUnitSize / 30));
+        context.fillText("SUPER COMBO!", (canvas.width / 2), (canvas.height / 2) - (comboKingToken * baseUnitSize / 30));
         comboKingToken++;
     }
     if (gameStartToken < 60) {
@@ -458,6 +458,15 @@ function gravity() {
     }
 }
 
+var fallspeedReference = 1;
+
+function fallSpeedListener() {
+    if(fallSpeed == (fallspeedReference + 1)) {
+        speedIncreaseToken = 0;
+        fallspeedReference++;
+    }
+}
+
 var gamePlayRounds = 0;
 
 function setDifficulty() {
@@ -473,6 +482,7 @@ function setDifficulty() {
         blocksAddedToken = 0;
     }
     fallSpeed = Math.floor(playerScore / 100) + 1;
+    fallSpeedListener();
 }
 
 function createChallengeRow(numberOfRows) {

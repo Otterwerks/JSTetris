@@ -2,6 +2,8 @@
 //--------------------------------------------------------------------------------
 var canvas = document.getElementById("gameCanvas");
 var context = canvas.getContext("2d");
+var sideCanvas = document.getElementById("statCanvas");
+var sideContext = sideCanvas.getContext("2d");
 
 var baseUnitSize = 40; // Tetromino block size in pixels, this value scales everything
 const FPS = 30; // Frames per second
@@ -16,15 +18,33 @@ let canvasRightSide = canvas.getBoundingClientRect().right; //is this used?
 
 function setSize() {
     if (window.innerHeight >= window.innerWidth) {
-        baseUnitSize = Math.floor(window.innerWidth * 0.8 / width);
+        baseUnitSize = Math.floor(window.innerWidth * 0.9 / (width + 6));
     }
     else if (window.innerHeight < window.innerWidth) {
         baseUnitSize = Math.floor(window.innerHeight * 0.9 / height);
     }
+
+    let gameOffset = (window.innerWidth / 2) - ((width + 6) * baseUnitSize / 2);
+
     canvas.width = baseUnitSize * width;
     canvas.height = baseUnitSize * height;
-    futurePiece.xPosition = canvas.width - (3 * baseUnitSize);
-    futurePiece.yPosition = baseUnitSize + (baseUnitSize / 2);
+    canvas.style.position = "absolute";
+    canvas.style.left = gameOffset + "px";
+    canvas.style.top = "0px";
+
+    sideCanvas.width = baseUnitSize * 6;
+    sideCanvas.height = canvas.height;
+    sideCanvas.style.position = "absolute";
+    sideCanvas.style.left = (gameOffset + canvas.width) + "px";
+    sideCanvas.style.top = "0px";
+
+    futurePiece.xPosition = 2 * baseUnitSize;
+    futurePiece.yPosition = 2 * baseUnitSize;
+    initializeLayout();
+}
+
+function initializeLayout() {
+    //
 }
 
 var gamePiece = {
@@ -98,7 +118,7 @@ var gridColor = "#ccc";
 
 // const THEME_99 = ["", "", "", "", ""]; copy paste for adding new theme
 
-themes = [
+var themes = [
     ["#ED6A5A", "#F4F1BB", "#9BC1BC", "#7D7C84", "#E6EBE0"], // theme 1
     ["#FBF5F3", "#522B47", "#7B0828", "#7D7C84", "#0F0E0E"], // theme 2
     ["#FF715B", "#522B47", "#FFFFFF", "#7D7C84", "#1EA896"], // theme 3
@@ -119,10 +139,22 @@ themes = [
     ["#BFB1CC", "#6C6E6C", "#60495A", "#3F3244", "#2F2235"], // theme 18
     ["#171C55", "#74A4BC", "#B6D6CC", "#F1FEC6", "#A32515"], // theme 19
     ["#EEE0CB", "#BAA898", "#848586", "#C2847A", "#3B1719"], // theme 20
+    ["#0FA3B1", "#777D75", "#EDDEA4", "#F7A072", "#FF9B42"], // theme 21
+    ["#4F4D53", "#D1C3B4", "#5A435B", "#A53860", "#47937B"], // theme 22
+    ["#9D1C2D", "#B24628", "#2E294E", "#198C7F", "#B4C564"], // theme 23
+    ["#387A84", "#99C8BE", "#DCE2C8", "#CC5600", "#F28A3C"], // theme 24
+    ["#3A2E39", "#B03B3C", "#1E555C", "#875644", "#F1C6A4"], // theme 25
+
+
+    
 ];
 
+var activeTheme = 0; 
+
 function randomTheme() {
-    colors = themes[Math.floor(Math.random() * themes.length)];
+    let i = Math.floor(Math.random() * themes.length);
+    colors = themes[i];
+    activeTheme = i + 1;
 }
 
 
@@ -139,9 +171,12 @@ window.onload = function() {
     addToQueue(3);
     setFuturePiece();
     newRound();
+    checkServerStatus();
+    setInterval(function() {checkServerStatus()}, 30000);
     setInterval(function() {
         if (gameState == 1) {
             context.clearRect(0, 0, canvas.width, canvas.height);
+            sideContext.clearRect(0, 0, sideCanvas.width, sideCanvas.height);
             gamePiece.updateTemplate(); // required because gamePiece.template does not dynamically update with xPosition and yPosition
             detectCollision();
             gravity();
@@ -154,6 +189,7 @@ window.onload = function() {
         }
         else if (gameState == 0) {
             context.clearRect(0, 0, canvas.width, canvas.height);
+            sideContext.clearRect(0, 0, sideCanvas.width, sideCanvas.height);
             drawStats();
             drawGameOver();
             drawLeaderboard();
@@ -175,10 +211,21 @@ var playerName = "";
 var leaderboard = 0;
 
 function drawStats() {
-    context.font = (baseUnitSize / 2) + "px Monaco";
-    context.fillStyle = "#555";
-    context.textAlign = "left";
-    context.fillText("Score: " + playerScore, baseUnitSize, baseUnitSize);
+    sideContext.font = (baseUnitSize / 2) + "px Helvetica";
+    sideContext.fillStyle = "#555";
+    sideContext.textAlign = "center";
+    sideContext.fillText("Next Piece:", baseUnitSize * 3, baseUnitSize / 1.5);
+    sideContext.fillText("Game Stats", baseUnitSize * 3, baseUnitSize * 6);
+    sideContext.textAlign = "left";
+    sideContext.fillText("Score: " + playerScore, baseUnitSize, baseUnitSize * 7);
+    sideContext.fillText("Rows Cleared: " + totalRowsCleared, baseUnitSize, baseUnitSize * 8);
+    sideContext.fillText("Round: " + gamePlayRounds, baseUnitSize, baseUnitSize * 9);
+    sideContext.fillText("Speed: " + fallSpeed, baseUnitSize, baseUnitSize * 10)
+    sideContext.fillText("Theme: " + activeTheme, baseUnitSize, baseUnitSize * 11);
+    sideContext.fillText("Server Status:", baseUnitSize, baseUnitSize * 12);
+    sideContext.textAlign = "center";
+    sideContext.fillStyle = serverStatus.color;
+    sideContext.fillText(serverStatus.status, baseUnitSize * 3, baseUnitSize * 13);
 }
 
 function drawLeaderboard() {
@@ -362,13 +409,13 @@ function drawShadowPiece() {
 
 function drawNextPiece() {
     for (let i = 0; i < 4; i++) {
-        context.beginPath();
-        context.fillStyle = colors[futurePiece.color];
-        context.lineWidth = baseUnitSize / 10;
-        context.strokeStyle = "black";
-        context.rect(futurePiece.template[i][0], futurePiece.template[i][1], baseUnitSize, baseUnitSize);
-        context.fill();
-        context.stroke();
+        sideContext.beginPath();
+        sideContext.fillStyle = colors[futurePiece.color];
+        sideContext.lineWidth = baseUnitSize / 10;
+        sideContext.strokeStyle = "black";
+        sideContext.rect(futurePiece.template[i][0], futurePiece.template[i][1], baseUnitSize, baseUnitSize);
+        sideContext.fill();
+        sideContext.stroke();
     }
 }
 
@@ -406,10 +453,16 @@ function gamePieceShadow() {
     shadowPiece.xPosition = gamePiece.xPosition;
     shadowPiece.yPosition = canvas.height;
     shadowPiece.updateTemplate();
+    liftShadow();
+}
+
+function liftShadow() {
     for (let i = 0; i < 4; i++) {
         if ((shadowPiece.template[i][1] + baseUnitSize) > canvas.height) {
             shadowPiece.yPosition = shadowPiece.yPosition - (shadowPiece.template[i][1] - canvas.height) - baseUnitSize;
             shadowPiece.updateTemplate();
+            liftShadow();
+            return;
         }
         else if (fallenPieces.length > 0) {
             for (let j = 0; j < fallenPieces.length; j++) {
@@ -418,27 +471,12 @@ function gamePieceShadow() {
                     (shadowPiece.template[i][1] + baseUnitSize) > fallenPieces[j][1]) {
                         shadowPiece.yPosition = shadowPiece.yPosition - (shadowPiece.template[i][1] - fallenPieces[j][1]) - baseUnitSize;
                         shadowPiece.updateTemplate();
+                        liftShadow();
+                        return;
                 }
             }
         }
     }
-    // Looped through again to make shadow work, temporary fix!
-    for (let i = 0; i < 4; i++) {
-        if ((shadowPiece.template[i][1] + baseUnitSize) > canvas.height) {
-            shadowPiece.yPosition = shadowPiece.yPosition - (shadowPiece.template[i][1] - canvas.height) - baseUnitSize;
-            shadowPiece.updateTemplate();
-        }
-        else if (fallenPieces.length > 0) {
-            for (let j = 0; j < fallenPieces.length; j++) {
-                if (shadowPiece.template[i][0] == fallenPieces[j][0] &&
-                    (gamePiece.template[i][1] + baseUnitSize) < fallenPieces[j][1] &&
-                    (shadowPiece.template[i][1] + baseUnitSize) > fallenPieces[j][1]) {
-                        shadowPiece.yPosition = shadowPiece.yPosition - (shadowPiece.template[i][1] - fallenPieces[j][1]) - baseUnitSize;
-                        shadowPiece.updateTemplate();
-                }
-            }
-        }
-    }    
 }
                 
 
@@ -715,6 +753,27 @@ function submitScore() {
     xhr.send(JSON.stringify({name: playerName, score: playerScore}));
 }
 
+var serverStatus = {status: "Unknown", color: "darkgrey"};
+
+function checkServerStatus() {
+    let xhr = new XMLHttpRequest();
+    xhr.open("GET", "https://otterwerks.net:2222/status", true);
+    xhr.onload = function () {
+        if (xhr.readyState === xhr.DONE && 
+            xhr.status === 200) {
+                serverStatus.status = "Online";
+                serverStatus.color = "green";
+                return;
+        }
+        else {
+            serverStatus.status = "Offline";
+            serverStatus.color = "red";
+            return;
+        }
+    };   
+    xhr.send();
+}
+
 function checkNewHighScore() {
     if (leaderboard != 0) {
         if (playerScore >= leaderboard[(leaderboard.length) - 1].score) {
@@ -848,6 +907,12 @@ function keyDownHandler(event) {
         else if (event.keyCode == 76) {
             // L key
             gamePiece.type = "L";
+        }
+        else if (event.keyCode == 16) {
+            // Right Shift key
+            let i = prompt("Enter a theme number...")
+            colors = themes[i - 1];
+            activeTheme = i;
         }
         // RDFG movement pad without boundary checks
         else if (event.keyCode == 68) {

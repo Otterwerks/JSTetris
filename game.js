@@ -1,5 +1,6 @@
 // Initialization
 //--------------------------------------------------------------------------------
+var main = document.getElementById("main");
 var canvas = document.getElementById("gameCanvas");
 var context = canvas.getContext("2d");
 var sideCanvas = document.getElementById("statCanvas");
@@ -44,7 +45,21 @@ function setSize() {
 }
 
 function initializeLayout() {
-    //
+    canvas.style.display = "block";
+    canvas.style.backgroundColor = "#EEE";
+    canvas.style.borderWidth = (baseUnitSize / 4) + "px";
+    canvas.style.borderTopStyle = "solid";
+    canvas.style.borderLeftStyle = "solid";
+    canvas.style.borderRightStyle = "none";
+    canvas.style.borderBottomStyle = "solid";
+    sideCanvas.style.display = "block";
+    sideCanvas.style.backgroundColor = "#EEE";
+    sideCanvas.style.borderWidth = (baseUnitSize / 4) + "px";
+    sideCanvas.style.borderTopStyle = "solid";
+    sideCanvas.style.borderLeftStyle = "none";
+    sideCanvas.style.borderRightStyle = "solid";
+    sideCanvas.style.borderBottomStyle = "solid";
+    main.style.backgroundColor = colors[0];
 }
 
 var gamePiece = {
@@ -164,7 +179,7 @@ var themes = [
     ["#C1C1C1", "#2C4251", "#D16666", "#B6C649", "#FFFFFF"], // theme 11
     ["#2F4046", "#124559", "#598392", "#AEC3B0", "#83877B"], // theme 12
     ["#012622", "#003B36", "#6C696E", "#E98A15", "#59114D"], // theme 13
-    ["#DD6E42", "#E8DAB2", "#4F6D7A", "#C0D6DF", "#808080"], // theme 14
+    ["#DD6E42", "#E8DAB2", "#4F6D7A", "#C0D6DF", "#808080"], // theme 14 +
     ["#BEE9E8", "#62B6CB", "#1B4965", "#A6BFD1", "#5FA8D3"], // theme 15
     ["#FFB997", "#F67E7D", "#843B62", "#211940", "#74546A"], // theme 16
     ["#FAA916", "#FBFFFE", "#6D676E", "#2F2F32", "#96031A"], // theme 17
@@ -198,8 +213,8 @@ var gameState = 1;
 window.onresize = function() {setSize()};
 
 window.onload = function() {
-    setSize();
     randomTheme();
+    setSize();
     addToQueue(3);
     setFuturePiece();
     newRound();

@@ -47,13 +47,17 @@ function setSize() {
 function initializeLayout() {
     canvas.style.display = "block";
     canvas.style.backgroundColor = "#EEE";
+    canvas.style.borderTopLeftRadius = (baseUnitSize / 4) + "px";
+    canvas.style.borderBottomLeftRadius = (baseUnitSize / 4) + "px";
     canvas.style.borderWidth = (baseUnitSize / 4) + "px";
     canvas.style.borderTopStyle = "solid";
     canvas.style.borderLeftStyle = "solid";
     canvas.style.borderRightStyle = "none";
     canvas.style.borderBottomStyle = "solid";
     sideCanvas.style.display = "block";
-    sideCanvas.style.backgroundColor = "#EEE";
+    sideCanvas.style.backgroundColor = "#FFFFFFAA";
+    sideCanvas.style.borderTopRightRadius = (baseUnitSize / 4) + "px";
+    sideCanvas.style.borderBottomRightRadius = (baseUnitSize / 4) + "px";
     sideCanvas.style.borderWidth = (baseUnitSize / 4) + "px";
     sideCanvas.style.borderTopStyle = "solid";
     sideCanvas.style.borderLeftStyle = "none";
@@ -161,7 +165,7 @@ function drawFrame() {
 // Colors and Themes
 //--------------------------------------------------------------------------------
 var colors = ["red", "green", "blue", "purple", "yellow", "orange", "pink"];
-var gridColor = "#ccc";
+var gridColor = "#AAA";
 
 // const THEME_99 = ["", "", "", "", ""]; copy paste for adding new theme
 
@@ -260,22 +264,22 @@ var playerName = "";
 var leaderboard = 0;
 
 function drawStats() {
-    sideContext.font = "bold " + (baseUnitSize / 1.5) + "px Helvetica";
-    sideContext.fillStyle = "#555";
+    sideContext.font = "bold " + (baseUnitSize / 1.5) + "px Monaco";
+    sideContext.fillStyle = "#333";
     sideContext.textAlign = "center";
-    sideContext.fillText("Next Piece", sideCanvas.width / 2, baseUnitSize);
-    sideContext.fillText("Game Stats", sideCanvas.width / 2, baseUnitSize * 8);
-    sideContext.font = (baseUnitSize / 2) + "px Helvetica";
+    sideContext.fillText("NEXT PIECE", sideCanvas.width / 2, baseUnitSize);
+    sideContext.fillText("GAME STATS", sideCanvas.width / 2, baseUnitSize * 8);
+    sideContext.font = (baseUnitSize / 2) + "px Monaco";
     sideContext.textAlign = "left";
-    sideContext.fillText("Score: " + playerScore, baseUnitSize, baseUnitSize * 9);
-    sideContext.fillText("Rows Cleared: " + totalRowsCleared, baseUnitSize, baseUnitSize * 10);
-    sideContext.fillText("Round: " + gamePlayRounds, baseUnitSize, baseUnitSize * 11);
-    sideContext.fillText("Speed: " + fallSpeed, baseUnitSize, baseUnitSize * 12);
-    sideContext.fillText("Theme: " + activeTheme, baseUnitSize, baseUnitSize * 13);
-    sideContext.font = "bold " + (baseUnitSize / 2) + "px Helvetica";
+    sideContext.fillText("Score: " + playerScore, baseUnitSize / 2, baseUnitSize * 9);
+    sideContext.fillText("Rows Cleared: " + totalRowsCleared, baseUnitSize / 2, baseUnitSize * 10);
+    sideContext.fillText("Round: " + gamePlayRounds, baseUnitSize / 2, baseUnitSize * 11);
+    sideContext.fillText("Speed: " + fallSpeed, baseUnitSize / 2, baseUnitSize * 12);
+    sideContext.fillText("Theme: " + activeTheme, baseUnitSize / 2, baseUnitSize * 13);
+    sideContext.font = "bold " + (baseUnitSize / 2) + "px Monaco";
     sideContext.textAlign = "center";
-    sideContext.fillText("Server Status", sideCanvas.width / 2, baseUnitSize * 18);
-    sideContext.font = (baseUnitSize / 2) + "px Helvetica";
+    sideContext.fillText("SERVER STATUS", sideCanvas.width / 2, baseUnitSize * 18);
+    sideContext.font = (baseUnitSize / 2) + "px Monaco";
     sideContext.fillStyle = serverStatus.color;
     sideContext.fillText(serverStatus.status, sideCanvas.width / 2, baseUnitSize * 19);
 }
@@ -283,16 +287,16 @@ function drawStats() {
 function drawLeaderboard() {
     if (leaderboard != 0) {
         for (let i = 0; i < leaderboard.length; i++) {
-            context.font = baseUnitSize + "px Helvetica";
+            context.font = baseUnitSize + "px Monaco";
             context.fillStyle = colors[1];
             context.textAlign = "center";
-            context.fillText("LEADERBOARD", (canvas.width / 2), baseUnitSize * 7);
-            context.font = (baseUnitSize / 2) + "px Helvetica";
-            context.fillText((leaderboard[i].name + ": " + leaderboard[i].score), (canvas.width / 2), (baseUnitSize * 8) + (i * baseUnitSize));
+            context.fillText("LEADERBOARD", (canvas.width / 2), baseUnitSize * 9);
+            context.font = (baseUnitSize / 2) + "px Monaco";
+            context.fillText((leaderboard[i].name + ": " + leaderboard[i].score), (canvas.width / 2), (baseUnitSize * 10) + (i * baseUnitSize));
         }
     }
     else if (leaderboard == 0) {
-        context.font = (baseUnitSize / 2) + "px Helvetica";
+        context.font = (baseUnitSize / 2) + "px Monaco";
         context.fillStyle = "SteelBlue";
         context.textAlign = "center";
         context.fillText("Leaderboard Unavailable...", (canvas.width / 2), baseUnitSize * 6);
@@ -300,12 +304,12 @@ function drawLeaderboard() {
 }
 
 function drawGameOver() {
-    context.font = baseUnitSize + "px Monaco";
-    context.fillStyle = "#555";
     context.textAlign = "center";
-    context.fillText("GAME OVER", (canvas.width / 2), baseUnitSize * 2);
+    context.fillStyle = "#555";
+    context.font = baseUnitSize + "px Monaco";
+    context.fillText("GAME OVER", (canvas.width / 2), baseUnitSize * 6);
     context.font = (baseUnitSize / 2) + "px Monaco";
-    context.fillText("Refresh page to play again", (canvas.width / 2), baseUnitSize * 3);
+    context.fillText("Refresh page to play again", (canvas.width / 2), baseUnitSize * 7);
 }
 
 function animateBlocksUp() {
@@ -316,6 +320,7 @@ function animateBlocksUp() {
             t += 10;
         }
     }
+    setTimeout(function() {canvas.style.backgroundImage = "linear-gradient(" + colors[2] + " 0, #EEE 20%, #EEE 80%," + colors[2] + " 100%)";}, t);
     animateBlocksDown(t);
 }
 
@@ -457,7 +462,7 @@ function drawShadowPiece() {
     for (let i = 0; i < 4; i++) {
         context.beginPath();
         context.lineWidth = baseUnitSize / 10;
-        context.strokeStyle = "darkgrey";
+        context.strokeStyle = "#666";
         context.rect(shadowPiece.template[i][0], shadowPiece.template[i][1], baseUnitSize, baseUnitSize);
         context.stroke();
     }

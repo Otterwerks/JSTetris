@@ -266,6 +266,7 @@ window.onload = function() {
             sideContext.clearRect(0, 0, sideCanvas.width, sideCanvas.height);
             drawStats();
             drawFrame();
+            drawNextPiece();
             drawRightSlidePanel();
             drawGameOver();
             drawLeaderboard();
@@ -305,9 +306,7 @@ function drawStats() {
     sideContext.font = "bold " + (baseUnitSize / 1.5) + "px Monaco";
     sideContext.fillStyle = "#555";
     sideContext.textAlign = "center";
-    if (gameState != 0) {
-        sideContext.fillText("NEXT PIECE", sideCanvas.width / 2, baseUnitSize);
-    }
+    sideContext.fillText("NEXT PIECE", sideCanvas.width / 2, baseUnitSize - (sideBarSlideUpToken / 8.5 * baseUnitSize * 70 / (sideBarSlideUpToken + 10)));
     sideContext.fillText("GAME STATS", sideCanvas.width / 2, (baseUnitSize * 8) - (sideBarSlideUpToken / 8.5 * baseUnitSize * 70 / (sideBarSlideUpToken + 10)));
     sideContext.font = (baseUnitSize / 2) + "px Monaco";
     sideContext.textAlign = "left";
@@ -393,22 +392,22 @@ function drawLeaderboard() {
             context.font = baseUnitSize + "px Monaco";
             context.fillStyle = colors[1];
             context.textAlign = "center";
-            context.fillText("LEADERBOARD", (canvas.width / 2), (baseUnitSize * 540 / gameOverSlideInToken));
+            context.fillText("LEADERBOARD", (canvas.width / 2), (baseUnitSize * 9 * 90 / gameOverSlideInToken));
             context.lineWidth = baseUnitSize / 100;
             context.strokeStyle = "#000";
-            context.strokeText("LEADERBOARD", (canvas.width / 2), (baseUnitSize * 540 / gameOverSlideInToken));
+            context.strokeText("LEADERBOARD", (canvas.width / 2), (baseUnitSize * 9 * 90 / gameOverSlideInToken));
             context.font = (baseUnitSize / 2) + "px Monaco";
-            context.fillText((leaderboard[i].name + ": " + leaderboard[i].score), (canvas.width / 2), ((baseUnitSize * 600 / gameOverSlideInToken) + (i * baseUnitSize)));
+            context.fillText((leaderboard[i].name + ": " + leaderboard[i].score), (canvas.width / 2), ((baseUnitSize * 10 * 90 / gameOverSlideInToken) + (i * baseUnitSize)));
             context.lineWidth = baseUnitSize / 100;
             context.strokeStyle = "#000";
-            context.strokeText((leaderboard[i].name + ": " + leaderboard[i].score), (canvas.width / 2), ((baseUnitSize * 600 / gameOverSlideInToken) + (i * baseUnitSize)));
+            context.strokeText((leaderboard[i].name + ": " + leaderboard[i].score), (canvas.width / 2), ((baseUnitSize * 10 * 90 / gameOverSlideInToken) + (i * baseUnitSize)));
         }
     }
     else if (leaderboard == 0) {
         context.font = (baseUnitSize / 2) + "px Monaco";
         context.fillStyle = "SteelBlue";
         context.textAlign = "center";
-        context.fillText("Leaderboard Unavailable...", (canvas.width / 2), baseUnitSize * 600 / gameOverSlideInToken);
+        context.fillText("Leaderboard Unavailable...", (canvas.width / 2), baseUnitSize * 10 * 90 / gameOverSlideInToken);
     }
 }
 
@@ -416,10 +415,10 @@ function drawGameOver() {
     context.textAlign = "center";
     context.fillStyle = "#555";
     context.font = baseUnitSize + "px Monaco";
-    context.fillText("GAME OVER", canvas.width - ((canvas.width * 30) / gameOverSlideInToken), baseUnitSize * 6);
+    context.fillText("GAME OVER", canvas.width - ((canvas.width * 45) / gameOverSlideInToken), baseUnitSize * 6);
     context.font = (baseUnitSize / 2) + "px Monaco";
-    context.fillText("Reload page to play again", ((canvas.width * 30) / gameOverSlideInToken), baseUnitSize * 7);
-    if (gameOverSlideInToken < 60) {
+    context.fillText("Reload page to play again", ((canvas.width * 45) / gameOverSlideInToken), baseUnitSize * 7);
+    if (gameOverSlideInToken < 90) {
         gameOverSlideInToken++;
     }
 }
@@ -599,6 +598,10 @@ function drawShadowPiece() {
 }
 
 function drawNextPiece() {
+    if (gameState == 0) {
+        futurePiece.yPosition = (3 * baseUnitSize) - (sideBarSlideUpToken / 8.5 * baseUnitSize * 70 / (sideBarSlideUpToken + 10));
+        futurePiece.updateTemplate();
+    }
     for (let i = 0; i < 4; i++) {
         sideContext.beginPath();
         sideContext.fillStyle = colors[futurePiece.color];

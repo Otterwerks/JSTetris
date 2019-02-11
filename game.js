@@ -113,7 +113,6 @@ function drawGrid() {
         context.strokeStyle = gridColor;
         context.stroke();
     }
-    
 }
 
 function drawFrame() {
@@ -214,11 +213,11 @@ function drawInstructions() {
     splashToken++;
 }
 function drawTetros() {
-    gamePiece.xPosition = (sideCanvas.width / 2) + baseUnitSize;
+    gamePiece.xPosition = (sideCanvas.width / 2) + baseUnitSize / 2;
     let tetroColor = 0;
     for (i = 1; i < 8; i++) {
         
-        gamePiece.yPosition = (i * 4 * baseUnitSize) - baseUnitSize;
+        gamePiece.yPosition = (i * 3.75 * baseUnitSize) - 2 * baseUnitSize;
         gamePiece.type = TETROMINOS[i - 1];
         gamePiece.updateTemplate();
         tetroColor++;
@@ -230,7 +229,7 @@ function drawTetros() {
             sideContext.fillStyle = colors[tetroColor];
             sideContext.lineWidth = baseUnitSize / 20;
             sideContext.strokeStyle = "black";
-            sideContext.rect(gamePiece.template[j][0] / 1.5, gamePiece.template[j][1] / 1.5, baseUnitSize / 1.5, baseUnitSize / 1.5);
+            sideContext.rect(gamePiece.template[j][0] / 1.4, gamePiece.template[j][1] / 1.4, baseUnitSize / 1.4, baseUnitSize / 1.4);
             sideContext.fill();
             sideContext.stroke();
         }

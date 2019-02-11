@@ -14,9 +14,6 @@ const DEBUG = false; // Enable testing functionality (read: cheats)
 var width = 10;
 var height = 20;
 
-//let canvasLeftSide = canvas.getBoundingClientRect().left; //is this used?
-//let canvasRightSide = canvas.getBoundingClientRect().right; //is this used?
-
 function setSize() {
     if (window.innerHeight >= window.innerWidth) {
         baseUnitSize = Math.floor(window.innerWidth * 0.9 / (width + 6));
@@ -180,35 +177,37 @@ var gameStartCounter = 0;
 
 function drawInstructions() {
     gameStartCounter = Math.ceil((300 - instructionsToken) / FPS);
-
-    context.textAlign = "left";
     context.fillStyle = "#333";
-    context.font = baseUnitSize / 1.5 + "px Monaco";
-    context.fillText("INSTRUCTIONS:", baseUnitSize, baseUnitSize * 2);
     context.textAlign = "center";
-    context.font = baseUnitSize / 2 + "px Monaco";
-    context.fillText("Keyboard Controls", canvas.width / 2, baseUnitSize * 4);
-    context.textAlign = "left";
-    context.font = baseUnitSize / 3 + "px Monaco";
-    context.fillText("Move Piece: left/right/down arrow keys", baseUnitSize, baseUnitSize * 5);
-    context.fillText("Rotate Piece: up arrow key", baseUnitSize, baseUnitSize * 6);
-    context.fillText("Drop Piece: space bar", baseUnitSize, baseUnitSize * 7);
-    context.textAlign = "center";
-    context.font = baseUnitSize / 2 + "px Monaco";
-    context.fillText("Touch Controls", canvas.width / 2, baseUnitSize * 9);
-    context.textAlign = "left";
-    context.font = baseUnitSize / 3 + "px Monaco";
-    context.fillText("Move Piece: swipe left/right/down", baseUnitSize, baseUnitSize * 10);
-    context.fillText("Rotate Piece: swipe up", baseUnitSize, baseUnitSize * 11);
-    context.fillText("Drop Piece: long swipe down", baseUnitSize, baseUnitSize * 12);
-    context.textAlign = "center";
-    context.font = baseUnitSize / 2 + "px Monaco";
-    context.fillText("GAME STARTING IN:", canvas.width / 2, baseUnitSize * 14);
     context.font = baseUnitSize + "px Monaco";
-    context.fillText(gameStartCounter, canvas.width / 2, baseUnitSize * 16);
+    context.fillText("Tetro Game", canvas.width / 2, baseUnitSize * 2);
+    context.textAlign = "left";
+    context.font = baseUnitSize / 1.5 + "px Monaco";
+    context.fillText("INSTRUCTIONS:", baseUnitSize, baseUnitSize * 4);
+    context.textAlign = "center";
     context.font = baseUnitSize / 2 + "px Monaco";
-    context.fillText("TAP OR CLICK", canvas.width / 2, baseUnitSize * 17);
-    context.fillText("TO SKIP", canvas.width / 2, baseUnitSize * 18);
+    context.fillText("Keyboard Controls", canvas.width / 2, baseUnitSize * 5.5);
+    context.textAlign = "left";
+    context.font = baseUnitSize / 3 + "px Monaco";
+    context.fillText("Move Piece: left/right/down arrow keys", baseUnitSize, baseUnitSize * 6.5);
+    context.fillText("Rotate Piece: up arrow key", baseUnitSize, baseUnitSize * 7.5);
+    context.fillText("Drop Piece: space bar", baseUnitSize, baseUnitSize * 8.5);
+    context.textAlign = "center";
+    context.font = baseUnitSize / 2 + "px Monaco";
+    context.fillText("Touch Controls", canvas.width / 2, baseUnitSize * 9.5);
+    context.textAlign = "left";
+    context.font = baseUnitSize / 3 + "px Monaco";
+    context.fillText("Move Piece: swipe left/right/down", baseUnitSize, baseUnitSize * 10.5);
+    context.fillText("Rotate Piece: swipe up", baseUnitSize, baseUnitSize * 11.5);
+    context.fillText("Drop Piece: long swipe down", baseUnitSize, baseUnitSize * 12.5);
+    context.textAlign = "center";
+    context.font = baseUnitSize / 2 + "px Monaco";
+    context.fillText("GAME STARTING IN:", canvas.width / 2, baseUnitSize * 15);
+    context.font = baseUnitSize + "px Monaco";
+    context.fillText(gameStartCounter, canvas.width / 2, baseUnitSize * 17);
+    context.font = baseUnitSize / 2 + "px Monaco";
+    context.fillText("TAP OR CLICK", canvas.width / 2, baseUnitSize * 18);
+    context.fillText("TO SKIP", canvas.width / 2, baseUnitSize * 19);
     if (instructionsToken == 300) {
         canvas.style.backgroundColor = "#EEE";
         sideCanvas.style.backgroundColor = "#FFFFFFAA";
@@ -289,8 +288,8 @@ window.onload = function() {
             gravity();
             drawGrid();
             drawFrame();
-            drawGamePiece();
             drawShadowPiece();
+            drawGamePiece();
             drawNextPiece();
             drawFallenPieces();
             drawStats();
@@ -770,9 +769,11 @@ function detectCollision() {
 function detectLateralCollisionLeft() {
     for (let i = 0; i < 4; i++) {
         for (let j = 0; j < fallenPieces.length; j++) {
-            if (gamePiece.template[i][0] == fallenPieces[j][0] + baseUnitSize &&
+            if ((gamePiece.template[i][0] == fallenPieces[j][0] + baseUnitSize &&
                 gamePiece.template[i][1] + baseUnitSize >= fallenPieces[j][1] &&
-                gamePiece.template[i][1] + baseUnitSize <= fallenPieces[j][1] + baseUnitSize) {
+                gamePiece.template[i][1] + baseUnitSize <= fallenPieces[j][1] + baseUnitSize) ||
+                (gamePiece.template[i][1] > fallenPieces[j][1] &&
+                gamePiece.template[i][1] < fallenPieces[j][1] + (baseUnitSize * 0.9))) {
                     return true;
                 }
         }
@@ -783,9 +784,11 @@ function detectLateralCollisionLeft() {
 function detectLateralCollisionRight() {
     for (let i = 0; i < 4; i++) {
         for (let j = 0; j < fallenPieces.length; j++) {
-            if (gamePiece.template[i][0] == fallenPieces[j][0] - baseUnitSize &&
+            if ((gamePiece.template[i][0] == fallenPieces[j][0] - baseUnitSize &&
                 gamePiece.template[i][1] + baseUnitSize >= fallenPieces[j][1] &&
-                gamePiece.template[i][1] + baseUnitSize <= fallenPieces[j][1] + baseUnitSize) {
+                gamePiece.template[i][1] + baseUnitSize <= fallenPieces[j][1] + baseUnitSize) ||
+                (gamePiece.template[i][1] > fallenPieces[j][1] &&
+                gamePiece.template[i][1] < fallenPieces[j][1] + (baseUnitSize * 0.9))) {
                     return true;
                 }
         }
@@ -1052,37 +1055,42 @@ function touchStart(event) {
     instructionsToken = 300;
     touchStartX = event.touches[0].pageX;
     touchStartY = event.touches[0].pageY;
+    if (gameState == -2) {
+        instructionsToken = 300;
+    }
 }
 
 function touchEnd(event) {
     event.preventDefault();
     let touchEndX = event.changedTouches[0].pageX;
     let touchEndY = event.changedTouches[0].pageY;
-    if (touchEndY > touchStartY + 2 * baseUnitSize &&
-            touchEndY < touchStartY + 6 * baseUnitSize) {
-                moveGamePiece("DOWN");
-                event.preventDefault();
-                return;
-            }
-    else if (touchEndY > touchStartY + 6 * baseUnitSize) {
-        fallSpeed = 40;
-        event.preventDefault();
-        return;
-    }
-    else if (touchEndY < touchStartY - 2 * baseUnitSize) {
-        rotateGamePiece("COUNTERCLOCKWISE");
-        event.preventDefault();
-        return;
-    }
-    else if (touchEndX > touchStartX + baseUnitSize ) {
-        moveGamePiece("RIGHT");
-        event.preventDefault;
-        return;
-    }
-    else if (touchEndX < touchStartX - baseUnitSize) {
-        moveGamePiece("LEFT");
-        event.preventDefault();
-        return;
+    if (gameState == 1) {
+        if (touchEndY > touchStartY + 2 * baseUnitSize &&
+                touchEndY < touchStartY + 6 * baseUnitSize) {
+                    moveGamePiece("DOWN");
+                    event.preventDefault();
+                    return;
+                }
+        else if (touchEndY > touchStartY + 6 * baseUnitSize) {
+            fallSpeed = 40;
+            event.preventDefault();
+            return;
+        }
+        else if (touchEndY < touchStartY - 2 * baseUnitSize) {
+            rotateGamePiece("COUNTERCLOCKWISE");
+            event.preventDefault();
+            return;
+        }
+        else if (touchEndX > touchStartX + baseUnitSize ) {
+            moveGamePiece("RIGHT");
+            event.preventDefault;
+            return;
+        }
+        else if (touchEndX < touchStartX - baseUnitSize) {
+            moveGamePiece("LEFT");
+            event.preventDefault();
+            return;
+        }
     }
 }
 
@@ -1091,33 +1099,35 @@ function touchMove(event) {
 }
 
 function keyDownHandler(event) {
-    if (event.keyCode == 39) {
-        // Right arrow
-        moveGamePiece("RIGHT");
-    }
-    else if (event.keyCode == 37) {
-        // Left arrow
-        moveGamePiece("LEFT");
-    }
-    else if (event.keyCode == 40) {
-        // Down arrow
-        moveGamePiece("DOWN");
-    }
-    else if (event.keyCode == 38) {
-        // Up arrow
-        rotateGamePiece("COUNTERCLOCKWISE");
-    }
-    else if (event.keyCode == 32) {
-        // Spacebar
-        fallSpeed = 40;
-    }
-    else if (event.keyCode == 81) {
-        // Q key
-        rotateGamePiece("COUNTERCLOCKWISE");
-    }
-    else if (event.keyCode == 87) {
-        // W key
-        rotateGamePiece("CLOCKWISE");
+    if (gameState == 1) {
+        if (event.keyCode == 39) {
+            // Right arrow
+            moveGamePiece("RIGHT");
+        }
+        else if (event.keyCode == 37) {
+            // Left arrow
+            moveGamePiece("LEFT");
+        }
+        else if (event.keyCode == 40) {
+            // Down arrow
+            moveGamePiece("DOWN");
+        }
+        else if (event.keyCode == 38) {
+            // Up arrow
+            rotateGamePiece("COUNTERCLOCKWISE");
+        }
+        else if (event.keyCode == 32) {
+            // Spacebar
+            fallSpeed = 40;
+        }
+        else if (event.keyCode == 81) {
+            // Q key
+            rotateGamePiece("COUNTERCLOCKWISE");
+        }
+        else if (event.keyCode == 87) {
+            // W key
+            rotateGamePiece("CLOCKWISE");
+        }
     }
     if (DEBUG == true) {
         // Game piece chooser

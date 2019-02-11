@@ -14,8 +14,8 @@ const DEBUG = false; // Enable testing functionality (read: cheats)
 var width = 10;
 var height = 20;
 
-let canvasLeftSide = canvas.getBoundingClientRect().left; //is this used?
-let canvasRightSide = canvas.getBoundingClientRect().right; //is this used?
+//let canvasLeftSide = canvas.getBoundingClientRect().left; //is this used?
+//let canvasRightSide = canvas.getBoundingClientRect().right; //is this used?
 
 function setSize() {
     if (window.innerHeight >= window.innerWidth) {
@@ -79,12 +79,7 @@ var gamePiece = {
     leftBoundary : 0,
     rightBoundary : 0,
     updateTemplate : function() {selectGamePiece(gamePiece, gamePiece.orientation, gamePiece.type)},
-    template : [
-        [], // each element is an array
-        [], // of values which represent
-        [], // the coordinates of each square
-        []  // that make the current tetromino
-    ]
+    template : []
 };
 
 var futurePiece = {
@@ -94,24 +89,14 @@ var futurePiece = {
     type : "I",
     color : "black",
     updateTemplate : function() {selectGamePiece(futurePiece, futurePiece.orientation, futurePiece.type)},
-    template : [
-        [], // each element is an array
-        [], // of values which represent
-        [], // the coordinates of each square
-        []  // that make the current tetromino
-    ]
+    template : []
 };
 
 var shadowPiece = {
     xPosition : canvas.width / 2,
     yPosition : 0,
     updateTemplate : function() {selectGamePiece(shadowPiece, gamePiece.orientation, gamePiece.type)},
-    template : [
-        [], // each element is an array
-        [], // of values which represent
-        [], // the coordinates of each square
-        []  // that make the current tetromino
-    ]
+    template : []
 };
 
 function drawGrid() {
@@ -176,6 +161,14 @@ function drawRightSlidePanel() {
         sideContext.lineWidth = baseUnitSize / 10;
         sideContext.strokeStyle = "black";
         sideContext.stroke();
+        sideContext.textAlign = "center";
+        sideContext.fillStyle = "#555";
+        sideContext.font = baseUnitSize / 1.5 + "px Monaco";
+        sideContext.fillText("THANKS FOR", panelLeftSide + sideCanvas.width / 2, baseUnitSize * 9);
+        sideContext.fillText("PLAYING!", panelLeftSide + sideCanvas.width / 2, baseUnitSize * 10);
+        sideContext.font = baseUnitSize / 2 + "px Monaco";
+        sideContext.fillText("Created by:", panelLeftSide + sideCanvas.width / 2, baseUnitSize * 13);
+        sideContext.fillText("Sam Weber", panelLeftSide + sideCanvas.width / 2, baseUnitSize * 14);
         if (rightSlidePanelToken < 30) {
             rightSlidePanelToken++;
         }
@@ -279,7 +272,7 @@ window.onload = function() {
                 checkNewHighScore();
             }
             gameState = 0;
-            setTimeout(function() {rightSlidePanelToken = 0;}, 2000);
+            setTimeout(function() {rightSlidePanelToken = 0;}, 1000);
         }
     }, 1000/FPS)
 }
@@ -392,22 +385,22 @@ function drawLeaderboard() {
             context.font = baseUnitSize + "px Monaco";
             context.fillStyle = colors[1];
             context.textAlign = "center";
-            context.fillText("LEADERBOARD", (canvas.width / 2), (baseUnitSize * 9 * 90 / gameOverSlideInToken));
+            context.fillText("LEADERBOARD", (canvas.width / 2), (baseUnitSize * 9 * 60 / gameOverSlideInToken));
             context.lineWidth = baseUnitSize / 100;
             context.strokeStyle = "#000";
-            context.strokeText("LEADERBOARD", (canvas.width / 2), (baseUnitSize * 9 * 90 / gameOverSlideInToken));
+            context.strokeText("LEADERBOARD", (canvas.width / 2), (baseUnitSize * 9 * 60 / gameOverSlideInToken));
             context.font = (baseUnitSize / 2) + "px Monaco";
-            context.fillText((leaderboard[i].name + ": " + leaderboard[i].score), (canvas.width / 2), ((baseUnitSize * 10 * 90 / gameOverSlideInToken) + (i * baseUnitSize)));
+            context.fillText((leaderboard[i].name + ": " + leaderboard[i].score), (canvas.width / 2), ((baseUnitSize * 10 * 60 / gameOverSlideInToken) + (i * baseUnitSize)));
             context.lineWidth = baseUnitSize / 100;
             context.strokeStyle = "#000";
-            context.strokeText((leaderboard[i].name + ": " + leaderboard[i].score), (canvas.width / 2), ((baseUnitSize * 10 * 90 / gameOverSlideInToken) + (i * baseUnitSize)));
+            context.strokeText((leaderboard[i].name + ": " + leaderboard[i].score), (canvas.width / 2), ((baseUnitSize * 10 * 60 / gameOverSlideInToken) + (i * baseUnitSize)));
         }
     }
     else if (leaderboard == 0) {
         context.font = (baseUnitSize / 2) + "px Monaco";
         context.fillStyle = "SteelBlue";
         context.textAlign = "center";
-        context.fillText("Leaderboard Unavailable...", (canvas.width / 2), baseUnitSize * 10 * 90 / gameOverSlideInToken);
+        context.fillText("Leaderboard Unavailable...", (canvas.width / 2), baseUnitSize * 10 * 60 / gameOverSlideInToken);
     }
 }
 
@@ -415,10 +408,10 @@ function drawGameOver() {
     context.textAlign = "center";
     context.fillStyle = "#555";
     context.font = baseUnitSize + "px Monaco";
-    context.fillText("GAME OVER", canvas.width - ((canvas.width * 45) / gameOverSlideInToken), baseUnitSize * 6);
+    context.fillText("GAME OVER", canvas.width - ((canvas.width * 30) / gameOverSlideInToken), baseUnitSize * 6);
     context.font = (baseUnitSize / 2) + "px Monaco";
-    context.fillText("Reload page to play again", ((canvas.width * 45) / gameOverSlideInToken), baseUnitSize * 7);
-    if (gameOverSlideInToken < 90) {
+    context.fillText("Reload page to play again", ((canvas.width * 30) / gameOverSlideInToken), baseUnitSize * 7);
+    if (gameOverSlideInToken < 60) {
         gameOverSlideInToken++;
     }
 }
@@ -856,7 +849,7 @@ function saveToFallen() {
         gamePiece.template[i].push(gamePiece.color);
         fallenPieces.push(gamePiece.template[i]);
         if (gamePiece.template[i][1] < 4 * baseUnitSize && dangerWarningToken == 60) {
-            dangerWarningToken = 0;
+            dangerWarningToken = 40;
         }
     }
 }
@@ -975,6 +968,9 @@ function checkNewHighScore() {
     if (leaderboard != 0) {
         if (playerScore >= leaderboard[(leaderboard.length) - 1].score) {
             playerName = prompt("Enter your name:");
+            if (playerName == null) {
+                playerName = "Anonymous";
+            }
             submitScore();
             buildLeaderboard();
         }

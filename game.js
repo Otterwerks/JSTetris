@@ -7,7 +7,7 @@ var sideCanvas = document.getElementById("statCanvas");
 var sideContext = sideCanvas.getContext("2d");
 
 var baseUnitSize = 40; // Tetromino block size in pixels, this value scales everything
-const FPS = 30; // Frames per second
+const FPS = 30; // Frames per second, game is tuned for 30
 const TETROMINOS = ["I", "O", "T", "S", "Z", "J", "L"];
 const DEBUG = false; // Enable testing functionality (read: cheats)
 
@@ -48,7 +48,7 @@ function setSize() {
 
 function initializeLayout() {
     canvas.style.display = "block";
-    canvas.style.backgroundColor = "#EEE";
+    canvas.style.backgroundColor = "#FFFFFFAA";
     canvas.style.borderTopLeftRadius = (baseUnitSize / 4) + "px";
     canvas.style.borderBottomLeftRadius = (baseUnitSize / 4) + "px";
     canvas.style.borderWidth = (baseUnitSize / 4) + "px";
@@ -58,7 +58,7 @@ function initializeLayout() {
     canvas.style.borderRightStyle = "solid";
     canvas.style.borderBottomStyle = "solid";
     sideCanvas.style.display = "block";
-    sideCanvas.style.backgroundColor = "#FFFFFFAA";
+    sideCanvas.style.backgroundColor = "#FFFFFF66";
     sideCanvas.style.borderTopRightRadius = (baseUnitSize / 4) + "px";
     sideCanvas.style.borderBottomRightRadius = (baseUnitSize / 4) + "px";
     sideCanvas.style.borderWidth = (baseUnitSize / 4) + "px";
@@ -175,6 +175,48 @@ function drawRightSlidePanel() {
     }
 }
 
+var instructionsToken = 0;
+var gameStartCounter = 0;
+
+function drawInstructions() {
+    gameStartCounter = Math.ceil((300 - instructionsToken) / FPS);
+
+    context.textAlign = "left";
+    context.fillStyle = "#333";
+    context.font = baseUnitSize / 1.5 + "px Monaco";
+    context.fillText("INSTRUCTIONS:", baseUnitSize, baseUnitSize * 2);
+    context.textAlign = "center";
+    context.font = baseUnitSize / 2 + "px Monaco";
+    context.fillText("Keyboard Controls", canvas.width / 2, baseUnitSize * 4);
+    context.textAlign = "left";
+    context.font = baseUnitSize / 3 + "px Monaco";
+    context.fillText("Move Piece: left/right/down arrow keys", baseUnitSize, baseUnitSize * 5);
+    context.fillText("Rotate Piece: up arrow key", baseUnitSize, baseUnitSize * 6);
+    context.fillText("Drop Piece: space bar", baseUnitSize, baseUnitSize * 7);
+    context.textAlign = "center";
+    context.font = baseUnitSize / 2 + "px Monaco";
+    context.fillText("Touch Controls", canvas.width / 2, baseUnitSize * 9);
+    context.textAlign = "left";
+    context.font = baseUnitSize / 3 + "px Monaco";
+    context.fillText("Move Piece: swipe left/right/down", baseUnitSize, baseUnitSize * 10);
+    context.fillText("Rotate Piece: swipe up", baseUnitSize, baseUnitSize * 11);
+    context.fillText("Drop Piece: long swipe down", baseUnitSize, baseUnitSize * 12);
+    context.textAlign = "center";
+    context.font = baseUnitSize / 2 + "px Monaco";
+    context.fillText("GAME STARTING IN:", canvas.width / 2, baseUnitSize * 14);
+    context.font = baseUnitSize + "px Monaco";
+    context.fillText(gameStartCounter, canvas.width / 2, baseUnitSize * 16);
+    context.font = baseUnitSize / 2 + "px Monaco";
+    context.fillText("TAP OR CLICK", canvas.width / 2, baseUnitSize * 17);
+    context.fillText("TO SKIP", canvas.width / 2, baseUnitSize * 18);
+    if (instructionsToken == 300) {
+        canvas.style.backgroundColor = "#EEE";
+        sideCanvas.style.backgroundColor = "#FFFFFFAA";
+        gameState = 1;
+    }
+    instructionsToken++;
+}
+
 
 // Colors and Themes
 //--------------------------------------------------------------------------------
@@ -226,7 +268,7 @@ function randomTheme() {
 // Main game loop
 //---------------------------------------------------------------------------------
 
-var gameState = 1;
+var gameState = -2;
 
 window.onresize = function() {setSize()};
 
@@ -273,6 +315,10 @@ window.onload = function() {
             }
             gameState = 0;
             setTimeout(function() {rightSlidePanelToken = 0;}, 1000);
+        }
+        else if (gameState == -2) {
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            drawInstructions();
         }
     }, 1000/FPS)
 }
@@ -424,7 +470,7 @@ function animateBlocksUp() {
             t += 10;
         }
     }
-    //setTimeout(function() {canvas.style.backgroundImage = "linear-gradient(" + colors[2] + " 0, #EEE 20%, #EEE 80%," + colors[2] + " 100%)";}, t);
+    //setTimeout(function() {canvas.style.backgroundImage = "linear-gradient(" + colors[2] + " 0, #EEE 20%, #EEE 80%," + colors[2] + " 100%)";}, t); had a "my first website" look
     setTimeout(function() {canvas.style.backgroundColor = "#FFFFFFAA";}, t);
     animateBlocksDown(t);
 }
@@ -996,12 +1042,14 @@ document.addEventListener("keydown", keyDownHandler, false);
 document.addEventListener("touchstart", touchStart, {passive: false});
 document.addEventListener("touchmove", touchMove, {passive: false});
 document.addEventListener("touchend", touchEnd, {passive: false});
+main.addEventListener("click", function() {instructionsToken = 300;});
 
 var touchStartX = 0;
 var touchStartY = 0;
 
 function touchStart(event) {
     event.preventDefault();
+    instructionsToken = 300;
     touchStartX = event.touches[0].pageX;
     touchStartY = event.touches[0].pageY;
 }

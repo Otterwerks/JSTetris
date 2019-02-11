@@ -172,11 +172,9 @@ function drawRightSlidePanel() {
     }
 }
 
-var instructionsToken = 0;
-var gameStartCounter = 0;
+var splashToken = 0;
 
 function drawInstructions() {
-    gameStartCounter = Math.ceil((300 - instructionsToken) / FPS);
     context.fillStyle = "#333";
     context.textAlign = "center";
     context.font = baseUnitSize + "px Monaco";
@@ -204,16 +202,39 @@ function drawInstructions() {
     context.font = baseUnitSize / 2 + "px Monaco";
     context.fillText("GAME STARTING IN:", canvas.width / 2, baseUnitSize * 15);
     context.font = baseUnitSize + "px Monaco";
-    context.fillText(gameStartCounter, canvas.width / 2, baseUnitSize * 17);
+    context.fillText(Math.ceil((300 - splashToken) / FPS), canvas.width / 2, baseUnitSize * 17);
     context.font = baseUnitSize / 2 + "px Monaco";
     context.fillText("TAP OR CLICK", canvas.width / 2, baseUnitSize * 18);
     context.fillText("TO SKIP", canvas.width / 2, baseUnitSize * 19);
-    if (instructionsToken == 300) {
+    if (splashToken == 300) {
         canvas.style.backgroundColor = "#EEE";
         sideCanvas.style.backgroundColor = "#FFFFFFAA";
-        gameState = 1;
+        gameState = -3;
     }
-    instructionsToken++;
+    splashToken++;
+}
+function drawTetros() {
+    gamePiece.xPosition = (sideCanvas.width / 2) + baseUnitSize;
+    let tetroColor = 0;
+    for (i = 1; i < 8; i++) {
+        
+        gamePiece.yPosition = (i * 4 * baseUnitSize) - baseUnitSize;
+        gamePiece.type = TETROMINOS[i - 1];
+        gamePiece.updateTemplate();
+        tetroColor++;
+        if (tetroColor >= colors.length) {
+            tetroColor = 0;
+        }
+        for (let j = 0; j < 4; j++) {
+            sideContext.beginPath();
+            sideContext.fillStyle = colors[tetroColor];
+            sideContext.lineWidth = baseUnitSize / 20;
+            sideContext.strokeStyle = "black";
+            sideContext.rect(gamePiece.template[j][0] / 1.5, gamePiece.template[j][1] / 1.5, baseUnitSize / 1.5, baseUnitSize / 1.5);
+            sideContext.fill();
+            sideContext.stroke();
+        }
+    }
 }
 
 
@@ -280,7 +301,7 @@ window.onload = function() {
     checkServerStatus();
     setInterval(function() {checkServerStatus()}, 30000);
     setInterval(function() {
-        if (gameState == 1) {
+        if (gameState == 1) { // Main Game
             context.clearRect(0, 0, canvas.width, canvas.height);
             sideContext.clearRect(0, 0, sideCanvas.width, sideCanvas.height);
             gamePiece.updateTemplate(); // required because gamePiece.template does not dynamically update with xPosition and yPosition
@@ -295,7 +316,7 @@ window.onload = function() {
             drawStats();
             showNotifications();
         }
-        else if (gameState == 0) {
+        else if (gameState == 0) { // Post Game
             context.clearRect(0, 0, canvas.width, canvas.height);
             sideContext.clearRect(0, 0, sideCanvas.width, sideCanvas.height);
             drawStats();
@@ -308,16 +329,26 @@ window.onload = function() {
                 sideBarSlideUpToken++;
             }
         }
-        else if (gameState == -1) {
+        else if (gameState == -1) { // Leaderboard/Scoring
             if (leaderboard != 0 && serverStatus.status == "Online") {
                 checkNewHighScore();
             }
             gameState = 0;
             setTimeout(function() {rightSlidePanelToken = 0;}, 1000);
         }
-        else if (gameState == -2) {
+        else if (gameState == -2) { // Splash
             context.clearRect(0, 0, canvas.width, canvas.height);
             drawInstructions();
+            drawTetros();
+        }
+        else if (gameState == -3) { // Initialize Game
+            gamePiece.xPosition = canvas.width / 2;
+            gamePiece.yPosition = - 3 * baseUnitSize;
+            gamePiece.orientation = Math.floor((Math.random() * 4) + 1);
+            gamePiece.type = TETROMINOS[Math.floor(Math.random() * TETROMINOS.length)];
+            gamePiece.color = Math.floor(Math.random() * colors.length);
+            gamePiece.updateTemplate();
+            gameState = 1;
         }
     }, 1000/FPS)
 }
@@ -1047,18 +1078,17 @@ document.addEventListener("keydown", keyDownHandler, false);
 document.addEventListener("touchstart", touchStart, {passive: false});
 document.addEventListener("touchmove", touchMove, {passive: false});
 document.addEventListener("touchend", touchEnd, {passive: false});
-main.addEventListener("click", function() {instructionsToken = 300;});
+main.addEventListener("click", function() {splashToken = 300;});
 
 var touchStartX = 0;
 var touchStartY = 0;
 
 function touchStart(event) {
     event.preventDefault();
-    instructionsToken = 300;
     touchStartX = event.touches[0].pageX;
     touchStartY = event.touches[0].pageY;
     if (gameState == -2) {
-        instructionsToken = 300;
+        splashToken = 300;
     }
 }
 

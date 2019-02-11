@@ -772,7 +772,8 @@ function detectLateralCollisionLeft() {
             if ((gamePiece.template[i][0] == fallenPieces[j][0] + baseUnitSize &&
                 gamePiece.template[i][1] + baseUnitSize >= fallenPieces[j][1] &&
                 gamePiece.template[i][1] + baseUnitSize <= fallenPieces[j][1] + baseUnitSize) ||
-                (gamePiece.template[i][1] > fallenPieces[j][1] &&
+                (gamePiece.template[i][0] == fallenPieces[j][0] + baseUnitSize &&
+                gamePiece.template[i][1] > fallenPieces[j][1] &&
                 gamePiece.template[i][1] < fallenPieces[j][1] + (baseUnitSize * 0.9))) {
                     return true;
                 }
@@ -787,7 +788,8 @@ function detectLateralCollisionRight() {
             if ((gamePiece.template[i][0] == fallenPieces[j][0] - baseUnitSize &&
                 gamePiece.template[i][1] + baseUnitSize >= fallenPieces[j][1] &&
                 gamePiece.template[i][1] + baseUnitSize <= fallenPieces[j][1] + baseUnitSize) ||
-                (gamePiece.template[i][1] > fallenPieces[j][1] &&
+                (gamePiece.template[i][0] == fallenPieces[j][0] - baseUnitSize &&
+                gamePiece.template[i][1] > fallenPieces[j][1] &&
                 gamePiece.template[i][1] < fallenPieces[j][1] + (baseUnitSize * 0.9))) {
                     return true;
                 }

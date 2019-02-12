@@ -159,10 +159,10 @@ function drawRightSlidePanel() {
         sideContext.stroke();
         sideContext.textAlign = "center";
         sideContext.fillStyle = "#555";
-        sideContext.font = baseUnitSize / 1.5 + "px Monaco";
+        sideContext.font = baseUnitSize / 1.5 + "px Monaco, monospace";
         sideContext.fillText("THANKS FOR", panelLeftSide + sideCanvas.width / 2, baseUnitSize * 9);
         sideContext.fillText("PLAYING!", panelLeftSide + sideCanvas.width / 2, baseUnitSize * 10);
-        sideContext.font = baseUnitSize / 2 + "px Monaco";
+        sideContext.font = baseUnitSize / 2 + "px Monaco, monospace";
         sideContext.fillText("Created by:", panelLeftSide + sideCanvas.width / 2, baseUnitSize * 13);
         sideContext.fillText("Sam Weber", panelLeftSide + sideCanvas.width / 2, baseUnitSize * 14);
         if (rightSlidePanelToken < 30) {
@@ -176,33 +176,33 @@ var splashToken = 0;
 function drawInstructions() {
     context.fillStyle = "#333";
     context.textAlign = "center";
-    context.font = baseUnitSize + "px Monaco";
+    context.font = baseUnitSize + "px Monaco, monospace";
     context.fillText("Tetro Game", canvas.width / 2, baseUnitSize * 2);
     context.textAlign = "left";
-    context.font = baseUnitSize / 1.5 + "px Monaco";
+    context.font = baseUnitSize / 1.5 + "px Monaco, monospace";
     context.fillText("INSTRUCTIONS:", baseUnitSize, baseUnitSize * 4);
     context.textAlign = "center";
-    context.font = baseUnitSize / 2 + "px Monaco";
+    context.font = baseUnitSize / 2 + "px Monaco, monospace";
     context.fillText("Keyboard Controls", canvas.width / 2, baseUnitSize * 5.5);
     context.textAlign = "left";
-    context.font = baseUnitSize / 3 + "px Monaco";
+    context.font = baseUnitSize / 3 + "px Monaco, monospace";
     context.fillText("Move Piece: left/right/down arrow keys", baseUnitSize, baseUnitSize * 6.5);
     context.fillText("Rotate Piece: up arrow key", baseUnitSize, baseUnitSize * 7.5);
     context.fillText("Drop Piece: space bar", baseUnitSize, baseUnitSize * 8.5);
     context.textAlign = "center";
-    context.font = baseUnitSize / 2 + "px Monaco";
+    context.font = baseUnitSize / 2 + "px Monaco, monospace";
     context.fillText("Touch Controls", canvas.width / 2, baseUnitSize * 9.5);
     context.textAlign = "left";
-    context.font = baseUnitSize / 3 + "px Monaco";
+    context.font = baseUnitSize / 3 + "px Monaco, monospace";
     context.fillText("Move Piece: swipe left/right/down", baseUnitSize, baseUnitSize * 10.5);
     context.fillText("Rotate Piece: swipe up", baseUnitSize, baseUnitSize * 11.5);
     context.fillText("Drop Piece: long swipe down", baseUnitSize, baseUnitSize * 12.5);
     context.textAlign = "center";
-    context.font = baseUnitSize / 2 + "px Monaco";
+    context.font = baseUnitSize / 2 + "px Monaco, monospace";
     context.fillText("GAME STARTING IN:", canvas.width / 2, baseUnitSize * 15);
-    context.font = baseUnitSize + "px Monaco";
+    context.font = baseUnitSize + "px Monaco, monospace";
     context.fillText(Math.ceil((300 - splashToken) / FPS), canvas.width / 2, baseUnitSize * 17);
-    context.font = baseUnitSize / 2 + "px Monaco";
+    context.font = baseUnitSize / 2 + "px Monaco, monospace";
     context.fillText("TAP OR CLICK", canvas.width / 2, baseUnitSize * 18);
     context.fillText("TO SKIP", canvas.width / 2, baseUnitSize * 19);
     if (splashToken == 300) {
@@ -371,22 +371,22 @@ var sideBarSlideRightToken = 0;
 var rightSlidePanelToken = -1;
 
 function drawStats() {
-    sideContext.font = "bold " + (baseUnitSize / 1.5) + "px Monaco";
+    sideContext.font = "bold " + (baseUnitSize / 1.5) + "px Monaco, monospace";
     sideContext.fillStyle = "#555";
     sideContext.textAlign = "center";
     sideContext.fillText("NEXT PIECE", sideCanvas.width / 2, baseUnitSize - (sideBarSlideUpToken / 8.5 * baseUnitSize * 70 / (sideBarSlideUpToken + 10)));
     sideContext.fillText("GAME STATS", sideCanvas.width / 2, (baseUnitSize * 8) - (sideBarSlideUpToken / 8.5 * baseUnitSize * 70 / (sideBarSlideUpToken + 10)));
-    sideContext.font = (baseUnitSize / 2) + "px Monaco";
+    sideContext.font = (baseUnitSize / 2) + "px Monaco, monospace";
     sideContext.textAlign = "left";
     sideContext.fillText("Score: " + playerScore, baseUnitSize / 2, (baseUnitSize * 9) - (sideBarSlideUpToken / 8.5 * baseUnitSize * 70 / (sideBarSlideUpToken + 10)));
     sideContext.fillText("Rows Cleared: " + totalRowsCleared, baseUnitSize / 2, baseUnitSize * 10 - (sideBarSlideUpToken / 8.5 * baseUnitSize * 70 / (sideBarSlideUpToken + 10)));
     sideContext.fillText("Round: " + gamePlayRounds, baseUnitSize / 2, (baseUnitSize * 11) - (sideBarSlideUpToken / 8.5 * baseUnitSize * 70 / (sideBarSlideUpToken + 10)));
     sideContext.fillText("Speed: " + fallSpeed, baseUnitSize / 2, (baseUnitSize * 12) - (sideBarSlideUpToken / 8.5 * baseUnitSize * 70 / (sideBarSlideUpToken + 10)));
     sideContext.fillText("Theme: " + activeTheme, baseUnitSize / 2, (baseUnitSize * 13) - (sideBarSlideUpToken / 8.5 * baseUnitSize * 70 / (sideBarSlideUpToken + 10)));
-    sideContext.font = "bold " + (baseUnitSize / 2) + "px Monaco";
+    sideContext.font = "bold " + (baseUnitSize / 2) + "px Monaco, monospace";
     sideContext.textAlign = "center";
     sideContext.fillText("SERVER STATUS", sideCanvas.width / 2, baseUnitSize * 18);
-    sideContext.font = (baseUnitSize / 2) + "px Monaco";
+    sideContext.font = (baseUnitSize / 2) + "px Monaco, monospace";
     sideContext.fillStyle = serverStatus.color;
     sideContext.fillText(serverStatus.status, sideCanvas.width / 2, baseUnitSize * 19);
 }
@@ -395,7 +395,7 @@ function showNotifications() {
     if (blocksAddedToken < 30) {
         context.textAlign = "center";
         context.fillStyle = colors[3];
-        context.font = ((baseUnitSize / 2) + (baseUnitSize / 60 * blocksAddedToken)) + "px Monaco";
+        context.font = ((baseUnitSize / 2) + (baseUnitSize / 60 * blocksAddedToken)) + "px Monaco, monospace";
         context.fillText("BLOCKS ADDED!", (canvas.width / 2), (canvas.height * 0.75) - (blocksAddedToken * baseUnitSize / 30));
         context.lineWidth = baseUnitSize / 100;
         context.strokeStyle = "#000";
@@ -405,7 +405,7 @@ function showNotifications() {
     if (speedIncreaseToken < 30) {
         context.textAlign = "center";
         context.fillStyle = colors[3];
-        context.font = ((baseUnitSize / 2) + (baseUnitSize / 30 * speedIncreaseToken)) + "px Monaco";
+        context.font = ((baseUnitSize / 2) + (baseUnitSize / 30 * speedIncreaseToken)) + "px Monaco, monospace";
         context.fillText("SPEED INCREASE!", (canvas.width / 2), (canvas.height * 0.25) + (speedIncreaseToken * baseUnitSize / 30));
         context.lineWidth = baseUnitSize / 100;
         context.strokeStyle = "#000";
@@ -415,7 +415,7 @@ function showNotifications() {
     if (rowComboToken < 30) {
         context.textAlign = "center";
         context.fillStyle = colors[3];
-        context.font = ((baseUnitSize / 2) + (baseUnitSize / 30 * rowComboToken)) + "px Monaco";
+        context.font = ((baseUnitSize / 2) + (baseUnitSize / 30 * rowComboToken)) + "px Monaco, monospace";
         context.fillText("COMBO!", (canvas.width / 2), (canvas.height / 2) - (rowComboToken * baseUnitSize / 30));
         context.lineWidth = baseUnitSize / 100;
         context.strokeStyle = "#000";
@@ -425,7 +425,7 @@ function showNotifications() {
     if (comboKingToken < 30) {
         context.textAlign = "center";
         context.fillStyle = colors[3];
-        context.font = ((baseUnitSize / 2) + (baseUnitSize / 30 * comboKingToken)) + "px Monaco";
+        context.font = ((baseUnitSize / 2) + (baseUnitSize / 30 * comboKingToken)) + "px Monaco, monospace";
         context.fillText("SUPER COMBO!", (canvas.width / 2), (canvas.height / 2) - (comboKingToken * baseUnitSize / 30));
         context.lineWidth = baseUnitSize / 100;
         context.strokeStyle = "#000";
@@ -435,7 +435,7 @@ function showNotifications() {
     if (gameStartToken < 60) {
         context.textAlign = "center";
         context.fillStyle = colors[3];
-        context.font = ((baseUnitSize / 2) + (baseUnitSize / 90 * gameStartToken)) + "px Monaco";
+        context.font = ((baseUnitSize / 2) + (baseUnitSize / 90 * gameStartToken)) + "px Monaco, monospace";
         context.fillText("GAME START!", (canvas.width / 2), (canvas.height / 2) - (gameStartToken * baseUnitSize / 15));
         context.lineWidth = baseUnitSize / 100;
         context.strokeStyle = "#000";
@@ -457,14 +457,14 @@ function showNotifications() {
 function drawLeaderboard() {
     if (leaderboard != 0) {
         for (let i = 0; i < leaderboard.length; i++) {
-            context.font = baseUnitSize + "px Monaco";
+            context.font = baseUnitSize + "px Monaco, monospace";
             context.fillStyle = colors[1];
             context.textAlign = "center";
             context.fillText("LEADERBOARD", (canvas.width / 2), (baseUnitSize * 9 * 60 / gameOverSlideInToken));
             context.lineWidth = baseUnitSize / 100;
             context.strokeStyle = "#000";
             context.strokeText("LEADERBOARD", (canvas.width / 2), (baseUnitSize * 9 * 60 / gameOverSlideInToken));
-            context.font = (baseUnitSize / 2) + "px Monaco";
+            context.font = (baseUnitSize / 2) + "px Monaco, monospace";
             context.fillText((leaderboard[i].name + ": " + leaderboard[i].score), (canvas.width / 2), ((baseUnitSize * 10 * 60 / gameOverSlideInToken) + (i * baseUnitSize)));
             context.lineWidth = baseUnitSize / 100;
             context.strokeStyle = "#000";
@@ -472,7 +472,7 @@ function drawLeaderboard() {
         }
     }
     else if (leaderboard == 0) {
-        context.font = (baseUnitSize / 2) + "px Monaco";
+        context.font = (baseUnitSize / 2) + "px Monaco, monospace";
         context.fillStyle = "SteelBlue";
         context.textAlign = "center";
         context.fillText("Leaderboard Unavailable...", (canvas.width / 2), baseUnitSize * 10 * 60 / gameOverSlideInToken);
@@ -482,9 +482,9 @@ function drawLeaderboard() {
 function drawGameOver() {
     context.textAlign = "center";
     context.fillStyle = "#555";
-    context.font = baseUnitSize + "px Monaco";
+    context.font = baseUnitSize + "px Monaco, monospace";
     context.fillText("GAME OVER", canvas.width - ((canvas.width * 30) / gameOverSlideInToken), baseUnitSize * 6);
-    context.font = (baseUnitSize / 2) + "px Monaco";
+    context.font = (baseUnitSize / 2) + "px Monaco, monospace";
     context.fillText("Reload page to play again", ((canvas.width * 30) / gameOverSlideInToken), baseUnitSize * 7);
     if (gameOverSlideInToken < 60) {
         gameOverSlideInToken++;

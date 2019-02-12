@@ -9,6 +9,7 @@ var sideContext = sideCanvas.getContext("2d");
 var baseUnitSize = 40; // Tetromino block size in pixels, this value scales everything
 const FPS = 30; // Frames per second, game is tuned for 30
 const TETROMINOS = ["I", "O", "T", "S", "Z", "J", "L"];
+const opacitySpectrum = ["00", "08", "10", "18", "20", "28", "30", "38", "40", "48", "50", "58", "60", "68", "70", "78", "80", "88", "90", "98", "A0", "A8", "B0", "B8", "C0", "C8", "D0", "D8", "E0", "E8", "F0", "F8", "FF"];
 const DEBUG = false; // Enable testing functionality (read: cheats)
 
 var width = 10;
@@ -212,6 +213,7 @@ function drawInstructions() {
     }
     splashToken++;
 }
+
 function drawTetros() {
     gamePiece.xPosition = (sideCanvas.width / 2) + baseUnitSize / 2;
     let tetroColor = 0;
@@ -236,6 +238,32 @@ function drawTetros() {
     }
 }
 
+var fadeToBlackToken = 0;
+
+function fadeToBlack() {
+    context.fillStyle = "#000000" + opacitySpectrum[Math.round(fadeToBlackToken / 15 * opacitySpectrum.length)];
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    sideContext.fillStyle = "#000000" + opacitySpectrum[Math.round(fadeToBlackToken / 15 * opacitySpectrum.length)];
+    sideContext.fillRect(0, 0, sideCanvas.width, sideCanvas.height);
+    if (fadeToBlackToken < 15) {
+        fadeToBlackToken++;
+    }
+}
+
+var fadeFromBlackToken = 15;
+
+function fadeFromBlack() {
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    sideContext.clearRect(0, 0, sideCanvas.width, sideCanvas.height);
+    context.fillStyle = "#000000" + opacitySpectrum[Math.round(fadeFromBlackToken / 15 * opacitySpectrum.length)];
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    sideContext.fillStyle = "#000000" + opacitySpectrum[Math.round(fadeFromBlackToken / 15 * opacitySpectrum.length)];
+    sideContext.fillRect(0, 0, sideCanvas.width, sideCanvas.height);
+    if (fadeFromBlackToken > 0) {
+        fadeFromBlackToken--;
+    }
+}
+
 
 // Colors and Themes
 //--------------------------------------------------------------------------------
@@ -251,13 +279,13 @@ var themes = [
     //["#F4E76E", "#F7FE72", "#8FF7A7", "#7D7C84", "#51BBFE"], // theme 4
     ["#FFEEF2", "#FFE4F3", "#FFC8FB", "#7D7C84", "#FF92C2"], // theme 5 (pink theme) ++
     ["#3D5A80", "#98C1D9", "#E0FBFC", "#EE6C4D", "#293241"], // theme 6 ++
-    ["#D8A47F", "#EF8354", "#EE4B6A", "#DF3B57", "#0F7173"], // theme 7
-    ["#725752", "#878E88", "#96C0B7", "#D4DFC7", "#FEF6C9"], // theme 8
+    ["#D8A47F", "#EF8354", "#AA4B6A", "#DF3B57", "#0F7173"], // theme 7
+    //["#725752", "#878E88", "#96C0B7", "#D4DFC7", "#FEF6C9"], // theme 8
     //["#DBF4AD", "#A9E190", "#CDC776", "#A5AA52", "#767522"], // theme 9
     //["#EAF2E3", "#61E8E1", "#F25757", "#F2E863", "#F2CD60"], // theme 10
     //["#C1C1C1", "#2C4251", "#D16666", "#B6C649", "#FFFFFF"], // theme 11
     ["#2F4046", "#124559", "#598392", "#AEC3B0", "#83877B"], // theme 12 ++
-    ["#012622", "#003B36", "#6C696E", "#E98A15", "#59114D"], // theme 13 -
+    //["#012622", "#003B36", "#6C696E", "#E98A15", "#59114D"], // theme 13
     ["#DD6E42", "#E8DAB2", "#4F6D7A", "#C0D6DF", "#808080"], // theme 14
     ["#BEE9E8", "#62B6CB", "#1B4965", "#A6BFD1", "#5FA8D3"], // theme 15 (blue theme)
     ["#FFB997", "#F67E7D", "#843B62", "#211940", "#74546A"], // theme 16 (sunset theme) ++
@@ -266,10 +294,10 @@ var themes = [
     //["#171C55", "#74A4BC", "#B6D6CC", "#F1FEC6", "#A32515"], // theme 19
     //["#EEE0CB", "#BAA898", "#848586", "#C2847A", "#3B1719"], // theme 20
     ["#0FA3B1", "#777D75", "#EDDEA4", "#F7A072", "#FF9B42"], // theme 21 (beach theme) ++
-    ["#4F4D53", "#5A435B", "#D1C3B4", "#A53860", "#47937B"], // theme 22
+    //["#4F4D53", "#5A435B", "#D1C3B4", "#A53860", "#47937B"], // theme 22
     ["#9D1C2D", "#B24628", "#2E294E", "#198C7F", "#B4C564"], // theme 23
     ["#387A84", "#99C8BE", "#DCE2C8", "#CC5600", "#F28A3C"], // theme 24 ++
-    ["#3A2E39", "#B03B3C", "#1E555C", "#875644", "#F1C6A4"], // theme 25 ++
+    //["#3A2E39", "#B03B3C", "#1E555C", "#875644", "#F1C6A4"], // theme 25
 
 
     
@@ -347,7 +375,21 @@ window.onload = function() {
             gamePiece.type = TETROMINOS[Math.floor(Math.random() * TETROMINOS.length)];
             gamePiece.color = Math.floor(Math.random() * colors.length);
             gamePiece.updateTemplate();
-            gameState = 1;
+            if (fadeToBlackToken < 15) {
+                fadeToBlack();
+            }
+            if (fadeToBlackToken == 15) {
+                fadeFromBlack();
+                drawGrid();
+                drawFrame();
+                drawNextPiece();
+                drawStats();
+            }
+            if (fadeFromBlackToken == 0) {
+                gameState = 1;
+                fadeToBlackToken = 0;
+                fadeFromBlackToken = 15;
+            }
         }
     }, 1000/FPS)
 }
@@ -442,7 +484,6 @@ function showNotifications() {
         context.strokeText("GAME START!", (canvas.width / 2), (canvas.height / 2) - (gameStartToken * baseUnitSize / 15));
         gameStartToken++;
     }
-    let opacitySpectrum = ["00", "08", "10", "18", "20", "28", "30", "38", "40", "48", "50", "58", "60", "68", "70", "78", "80", "88", "90", "98", "A0", "A8", "B0", "B8", "C0", "C8", "D0", "D8", "E0", "E8", "F0", "F8", "FF"];
     if (dangerWarningToken == 0) {
         canvas.style.backgroundColor = "#EEE";
         dangerWarningToken++;
@@ -499,7 +540,6 @@ function animateBlocksUp() {
             t += 10;
         }
     }
-    //setTimeout(function() {canvas.style.backgroundImage = "linear-gradient(" + colors[2] + " 0, #EEE 20%, #EEE 80%," + colors[2] + " 100%)";}, t); had a "my first website" look
     setTimeout(function() {canvas.style.backgroundColor = "#FFFFFFAA";}, t);
     animateBlocksDown(t);
 }
@@ -660,7 +700,7 @@ function drawShadowPiece() {
         context.beginPath();
         context.lineWidth = baseUnitSize / 10;
         context.strokeStyle = "#666";
-        context.rect(shadowPiece.template[i][0], shadowPiece.template[i][1], baseUnitSize, baseUnitSize);
+        context.rect(shadowPiece.template[i][0] + baseUnitSize / 10, shadowPiece.template[i][1] + baseUnitSize / 10, baseUnitSize - baseUnitSize / 5, baseUnitSize - baseUnitSize / 5);
         context.stroke();
     }
 }

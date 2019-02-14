@@ -1,6 +1,6 @@
 # JSTetris
 
-My own version of the classic puzzle game Tetris.
+_My own version of the classic puzzle game Tetris._
 
 <br>
 
@@ -11,8 +11,9 @@ My own version of the classic puzzle game Tetris.
 I decided to do a remake of a classic arcade game as an introduction to Javascript. I chose to make Tetris because it was always my favorite game as a kid and playing it brings back a great sense of nostalgia.
 
 ## Features
-- Responsive, mobile friendly
+- Responsive, touch friendly
 - Progressive difficulty through fall speed and additional bottom row blocks
+- Points are assigned at 10 points for a single row, 20 points per row if multiple rows are cleared at once
 - High scores loaded from and saved to a leaderboard server
 - Shadow outline of where the game piece will land
 

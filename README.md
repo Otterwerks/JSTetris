@@ -41,6 +41,15 @@ The game can be statically hosted and remains playable independently from the se
 
 <br>
 
+## Resources Used
+I devloped this game with the help of the following resources:
+- Creating a Pong Game ([link](https://www.udemy.com/code-your-first-game/))
+- Creating a Breakout Game ([link](https://developer.mozilla.org/en-US/docs/Games/Tutorials/2D_Breakout_game_pure_JavaScript))
+- Using HTML Canvas to Create a Game ([link](https://medium.freecodecamp.org/how-creating-simple-canvas-games-helped-me-6eef839f450e))
+- [Stackoverflow](https://www.stackoverflow.com) for occasional troubleshooting
+
+<br>
+
 ## Modifications
 The following sections are guidelines for changing parameters that will alter gameplay.
 

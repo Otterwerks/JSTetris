@@ -1,5 +1,5 @@
 // Initialization
-//--------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 var main = document.getElementById("main");
 var canvas = document.getElementById("gameCanvas");
 var context = canvas.getContext("2d");
@@ -7,13 +7,16 @@ var sideCanvas = document.getElementById("statCanvas");
 var sideContext = sideCanvas.getContext("2d");
 
 var baseUnitSize = 40; // Tetromino block size in pixels, this value scales everything
-const FPS = 30; // Frames per second, game is tuned for 30
+const FPS = 30;
 const TETROMINOS = ["I", "O", "T", "S", "Z", "J", "L"];
 const opacitySpectrum = ["00", "08", "10", "18", "20", "28", "30", "38", "40", "48", "50", "58", "60", "68", "70", "78", "80", "88", "90", "98", "A0", "A8", "B0", "B8", "C0", "C8", "D0", "D8", "E0", "E8", "F0", "F8", "FF"];
-const DEBUG = false; // Enable testing functionality (read: cheats)
 
 var width = 10;
 var height = 20;
+
+var playerScore = 0;
+var playerName = "";
+var leaderboard = 0;
 
 function setSize() {
     if (window.innerHeight >= window.innerWidth) {
@@ -97,6 +100,135 @@ var shadowPiece = {
     template : []
 };
 
+
+// Colors and Themes
+//------------------------------------------------------------------------------
+var colors = ["red", "green", "blue", "purple", "yellow", "orange", "pink"];
+var gridColor = "#AAA";
+
+// ["", "", "", "", ""], copy paste for adding new theme
+
+var themes = [
+    ["#FFEEF2", "#FFE4F3", "#FFC8FB", "#7D7C84", "#FF92C2"],
+    ["#3D5A80", "#98C1D9", "#E0FBFC", "#EE6C4D", "#293241"],
+    ["#D8A47F", "#EF8354", "#AA4B6A", "#DF3B57", "#0F7173"],
+    ["#2F4046", "#124559", "#598392", "#AEC3B0", "#83877B"],
+    ["#DD6E42", "#E8DAB2", "#4F6D7A", "#C0D6DF", "#808080"],
+    ["#BEE9E8", "#62B6CB", "#1B4965", "#A6BFD1", "#5FA8D3"],
+    ["#FFB997", "#F67E7D", "#843B62", "#211940", "#74546A"],
+    ["#BFB1CC", "#6C6E6C", "#60495A", "#3F3244", "#2F2235"],
+    ["#0FA3B1", "#777D75", "#EDDEA4", "#F7A072", "#FF9B42"],
+    ["#9D1C2D", "#B24628", "#2E294E", "#198C7F", "#B4C564"],
+    ["#387A84", "#99C8BE", "#DCE2C8", "#CC5600", "#F28A3C"],
+];
+
+var activeTheme = 0; 
+
+function randomTheme() {
+    let i = Math.floor(Math.random() * themes.length);
+    colors = themes[i];
+    activeTheme = i + 1;
+}
+
+
+// Main game loop and states
+//------------------------------------------------------------------------------
+var gameState = -2;
+
+window.onresize = function() {setSize()};
+
+window.onload = function() {
+    randomTheme();
+    setSize();
+    addToQueue(3);
+    setFuturePiece();
+    newRound();
+    checkServerStatus();
+    setInterval(function() {checkServerStatus()}, 30000);
+    setInterval(function() {
+        if (gameState == 1) { // Main Game
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            sideContext.clearRect(0, 0, sideCanvas.width, sideCanvas.height);
+            gamePiece.updateTemplate();
+            detectCollision();
+            gravity();
+            drawGrid();
+            drawFrame();
+            drawShadowPiece();
+            drawGamePiece();
+            drawNextPiece();
+            drawFallenPieces();
+            drawStats();
+            showNotifications();
+        }
+        else if (gameState == 0) { // Post Game
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            sideContext.clearRect(0, 0, sideCanvas.width, sideCanvas.height);
+            drawStats();
+            drawFrame();
+            drawNextPiece();
+            drawRightSlidePanel();
+            drawGameOver();
+            drawLeaderboard();
+            if (sideBarSlideUpToken < 60) {
+                sideBarSlideUpToken++;
+            }
+        }
+        else if (gameState == -1) { // Leaderboard/Scoring
+            if (leaderboard != 0 && serverStatus.status == "Online") {
+                checkNewHighScore();
+            }
+            gameState = 0;
+            setTimeout(function() {rightSlidePanelToken = 0;}, 1000);
+        }
+        else if (gameState == -2) { // Splash
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            drawInstructions();
+            drawTetros();
+        }
+        else if (gameState == -3) { // Initialize Game
+            gamePiece.xPosition = canvas.width / 2;
+            gamePiece.yPosition = - 3 * baseUnitSize;
+            gamePiece.orientation = Math.floor((Math.random() * 4) + 1);
+            gamePiece.type = TETROMINOS[Math.floor(Math.random() * TETROMINOS.length)];
+            gamePiece.color = Math.floor(Math.random() * colors.length);
+            gamePiece.updateTemplate();
+            if (fadeToBlackToken < 15) {
+                fadeToBlack();
+            }
+            if (fadeToBlackToken == 15) {
+                fadeFromBlack();
+                drawGrid();
+                drawFrame();
+                drawNextPiece();
+                drawStats();
+            }
+            if (fadeFromBlackToken == 0) {
+                gameState = 1;
+                fadeToBlackToken = 0;
+                fadeFromBlackToken = 15;
+            }
+        }
+    }, 1000/FPS)
+}
+
+
+// Canvas drawing and animations, tokens sync animations to frames
+//------------------------------------------------------------------------------
+var blocksAddedToken = 30;
+var speedIncreaseToken = 30;
+var rowComboToken = 30;
+var comboKingToken = 30;
+var gameStartToken = 0;
+var dangerWarningToken = 60;
+var gameOverSlideInToken = 0;
+var sideBarSlideUpToken = 0;
+var sideBarSlideRightToken = 0;
+var rightSlidePanelToken = -1;
+var splashToken = 0;
+var fadeToBlackToken = 0;
+var fadeFromBlackToken = 15;
+
 function drawGrid() {
     for (i = 0; i <= canvas.width; i += baseUnitSize) {
         context.beginPath();
@@ -172,8 +304,6 @@ function drawRightSlidePanel() {
     }
 }
 
-var splashToken = 0;
-
 function drawInstructions() {
     context.fillStyle = "#333";
     context.textAlign = "center";
@@ -238,8 +368,6 @@ function drawTetros() {
     }
 }
 
-var fadeToBlackToken = 0;
-
 function fadeToBlack() {
     context.fillStyle = "#000000" + opacitySpectrum[Math.round(fadeToBlackToken / 15 * opacitySpectrum.length)];
     context.fillRect(0, 0, canvas.width, canvas.height);
@@ -249,8 +377,6 @@ function fadeToBlack() {
         fadeToBlackToken++;
     }
 }
-
-var fadeFromBlackToken = 15;
 
 function fadeFromBlack() {
     context.clearRect(0, 0, canvas.width, canvas.height);
@@ -263,154 +389,6 @@ function fadeFromBlack() {
         fadeFromBlackToken--;
     }
 }
-
-
-// Colors and Themes
-//--------------------------------------------------------------------------------
-var colors = ["red", "green", "blue", "purple", "yellow", "orange", "pink"];
-var gridColor = "#AAA";
-
-// const THEME_99 = ["", "", "", "", ""]; copy paste for adding new theme
-
-var themes = [
-    //["#ED6A5A", "#9BC1BC", "#F4F1BB", "#7D7C84", "#E6EBE0"], // theme 1 ([4] is too light)
-    //["#FBF5F3", "#522B47", "#7B0828", "#7D7C84", "#0F0E0E"], // theme 2 
-    //["#FF715B", "#522B47", "#FFFFFF", "#7D7C84", "#1EA896"], // theme 3
-    //["#F4E76E", "#F7FE72", "#8FF7A7", "#7D7C84", "#51BBFE"], // theme 4
-    ["#FFEEF2", "#FFE4F3", "#FFC8FB", "#7D7C84", "#FF92C2"], // theme 5 (pink theme) ++
-    ["#3D5A80", "#98C1D9", "#E0FBFC", "#EE6C4D", "#293241"], // theme 6 ++
-    ["#D8A47F", "#EF8354", "#AA4B6A", "#DF3B57", "#0F7173"], // theme 7
-    //["#725752", "#878E88", "#96C0B7", "#D4DFC7", "#FEF6C9"], // theme 8
-    //["#DBF4AD", "#A9E190", "#CDC776", "#A5AA52", "#767522"], // theme 9
-    //["#EAF2E3", "#61E8E1", "#F25757", "#F2E863", "#F2CD60"], // theme 10
-    //["#C1C1C1", "#2C4251", "#D16666", "#B6C649", "#FFFFFF"], // theme 11
-    ["#2F4046", "#124559", "#598392", "#AEC3B0", "#83877B"], // theme 12 ++
-    //["#012622", "#003B36", "#6C696E", "#E98A15", "#59114D"], // theme 13
-    ["#DD6E42", "#E8DAB2", "#4F6D7A", "#C0D6DF", "#808080"], // theme 14
-    ["#BEE9E8", "#62B6CB", "#1B4965", "#A6BFD1", "#5FA8D3"], // theme 15 (blue theme)
-    ["#FFB997", "#F67E7D", "#843B62", "#211940", "#74546A"], // theme 16 (sunset theme) ++
-    //["#FAA916", "#FBFFFE", "#6D676E", "#2F2F32", "#96031A"], // theme 17 ([1] is white)
-    ["#BFB1CC", "#6C6E6C", "#60495A", "#3F3244", "#2F2235"], // theme 18 (purple theme) ++
-    //["#171C55", "#74A4BC", "#B6D6CC", "#F1FEC6", "#A32515"], // theme 19
-    //["#EEE0CB", "#BAA898", "#848586", "#C2847A", "#3B1719"], // theme 20
-    ["#0FA3B1", "#777D75", "#EDDEA4", "#F7A072", "#FF9B42"], // theme 21 (beach theme) ++
-    //["#4F4D53", "#5A435B", "#D1C3B4", "#A53860", "#47937B"], // theme 22
-    ["#9D1C2D", "#B24628", "#2E294E", "#198C7F", "#B4C564"], // theme 23
-    ["#387A84", "#99C8BE", "#DCE2C8", "#CC5600", "#F28A3C"], // theme 24 ++
-    //["#3A2E39", "#B03B3C", "#1E555C", "#875644", "#F1C6A4"], // theme 25
-
-
-    
-];
-
-var activeTheme = 0; 
-
-function randomTheme() {
-    let i = Math.floor(Math.random() * themes.length);
-    colors = themes[i];
-    activeTheme = i + 1;
-}
-
-
-// Main game loop
-//---------------------------------------------------------------------------------
-
-var gameState = -2;
-
-window.onresize = function() {setSize()};
-
-window.onload = function() {
-    randomTheme();
-    setSize();
-    addToQueue(3);
-    setFuturePiece();
-    newRound();
-    checkServerStatus();
-    setInterval(function() {checkServerStatus()}, 30000);
-    setInterval(function() {
-        if (gameState == 1) { // Main Game
-            context.clearRect(0, 0, canvas.width, canvas.height);
-            sideContext.clearRect(0, 0, sideCanvas.width, sideCanvas.height);
-            gamePiece.updateTemplate(); // required because gamePiece.template does not dynamically update with xPosition and yPosition
-            detectCollision();
-            gravity();
-            drawGrid();
-            drawFrame();
-            drawShadowPiece();
-            drawGamePiece();
-            drawNextPiece();
-            drawFallenPieces();
-            drawStats();
-            showNotifications();
-        }
-        else if (gameState == 0) { // Post Game
-            context.clearRect(0, 0, canvas.width, canvas.height);
-            sideContext.clearRect(0, 0, sideCanvas.width, sideCanvas.height);
-            drawStats();
-            drawFrame();
-            drawNextPiece();
-            drawRightSlidePanel();
-            drawGameOver();
-            drawLeaderboard();
-            if (sideBarSlideUpToken < 60) {
-                sideBarSlideUpToken++;
-            }
-        }
-        else if (gameState == -1) { // Leaderboard/Scoring
-            if (leaderboard != 0 && serverStatus.status == "Online") {
-                checkNewHighScore();
-            }
-            gameState = 0;
-            setTimeout(function() {rightSlidePanelToken = 0;}, 1000);
-        }
-        else if (gameState == -2) { // Splash
-            context.clearRect(0, 0, canvas.width, canvas.height);
-            drawInstructions();
-            drawTetros();
-        }
-        else if (gameState == -3) { // Initialize Game
-            gamePiece.xPosition = canvas.width / 2;
-            gamePiece.yPosition = - 3 * baseUnitSize;
-            gamePiece.orientation = Math.floor((Math.random() * 4) + 1);
-            gamePiece.type = TETROMINOS[Math.floor(Math.random() * TETROMINOS.length)];
-            gamePiece.color = Math.floor(Math.random() * colors.length);
-            gamePiece.updateTemplate();
-            if (fadeToBlackToken < 15) {
-                fadeToBlack();
-            }
-            if (fadeToBlackToken == 15) {
-                fadeFromBlack();
-                drawGrid();
-                drawFrame();
-                drawNextPiece();
-                drawStats();
-            }
-            if (fadeFromBlackToken == 0) {
-                gameState = 1;
-                fadeToBlackToken = 0;
-                fadeFromBlackToken = 15;
-            }
-        }
-    }, 1000/FPS)
-}
-
-// Scoring and loss conditions
-//---------------------------------------------------------------------------------
-
-var playerScore = 0;
-var playerName = "";
-var leaderboard = 0;
-
-var blocksAddedToken = 30;
-var speedIncreaseToken = 30;
-var rowComboToken = 30;
-var comboKingToken = 30;
-var gameStartToken = 0;
-var dangerWarningToken = 60;
-var gameOverSlideInToken = 0;
-var sideBarSlideUpToken = 0;
-var sideBarSlideRightToken = 0;
-var rightSlidePanelToken = -1;
 
 function drawStats() {
     sideContext.font = "bold " + (baseUnitSize / 1.5) + "px Monaco, monospace";
@@ -520,6 +498,57 @@ function drawLeaderboard() {
     }
 }
 
+function drawGamePiece() {
+    for (let i = 0; i < 4; i++) {
+        context.beginPath();
+        context.fillStyle = colors[gamePiece.color];
+        context.lineWidth = baseUnitSize / 10;
+        context.strokeStyle = "black";
+        context.rect(gamePiece.template[i][0], gamePiece.template[i][1], baseUnitSize, baseUnitSize);
+        context.fill();
+        context.stroke();
+    }
+}
+
+function drawShadowPiece() {
+    gamePieceShadow();
+    for (let i = 0; i < 4; i++) {
+        context.beginPath();
+        context.lineWidth = baseUnitSize / 10;
+        context.strokeStyle = "#666";
+        context.rect(shadowPiece.template[i][0] + baseUnitSize / 10, shadowPiece.template[i][1] + baseUnitSize / 10, baseUnitSize - baseUnitSize / 5, baseUnitSize - baseUnitSize / 5);
+        context.stroke();
+    }
+}
+
+function drawNextPiece() {
+    if (gameState == 0) {
+        futurePiece.yPosition = (3 * baseUnitSize) - (sideBarSlideUpToken / 8.5 * baseUnitSize * 70 / (sideBarSlideUpToken + 10));
+        futurePiece.updateTemplate();
+    }
+    for (let i = 0; i < 4; i++) {
+        sideContext.beginPath();
+        sideContext.fillStyle = colors[futurePiece.color];
+        sideContext.lineWidth = baseUnitSize / 10;
+        sideContext.strokeStyle = "black";
+        sideContext.rect(futurePiece.template[i][0], futurePiece.template[i][1], baseUnitSize, baseUnitSize);
+        sideContext.fill();
+        sideContext.stroke();
+    }
+}
+
+function drawFallenPieces() {
+    for (let i = 0; i < fallenPieces.length; i++) {
+        context.beginPath();
+        context.fillStyle = colors[fallenPieces[i][2]];
+        context.lineWidth = baseUnitSize / 10;
+        context.strokeStyle = "black";
+        context.rect(fallenPieces[i][0], fallenPieces[i][1], baseUnitSize, baseUnitSize);
+        context.fill();
+        context.stroke();
+    }
+}
+
 function drawGameOver() {
     context.textAlign = "center";
     context.fillStyle = "#555";
@@ -573,40 +602,34 @@ function downCallBack(j, i){
     }
 }
 
-function givePoints(rowsCleared) {
-    if (rowsCleared == 1) {
-        playerScore += 10;
-    }
-    else if (rowsCleared > 1 && rowsCleared < 4) {
-        playerScore += 20 * rowsCleared;
-        rowComboToken = 0;
-    }
-    else if (rowsCleared > 3) {
-        playerScore += 20 * rowsCleared;
-        comboKingToken = 0;
-    }
-}
 
-function checkLoss() {
-    for (i = 0; i < 4; i++) {
-        if (gamePiece.template[i][1] <= 0) {
-            // Game over!
-            dangerWarningToken = 0;
-            gameState = -99;
-            if (serverStatus.status == "Online") {
-                getLeaderboard();
-            }
-            animateBlocksUp();
-            return;
-        }
-    }
-}
-
-
-// Functionality
-//---------------------------------------------------------------------------------
-
+// Functionality and mechanics
+//------------------------------------------------------------------------------
 var futurePieces = [];
+var fallenPieces = [];
+var fallSpeed = 1; // base units per second
+var fallspeedReference = 1;
+var gamePlayRounds = 0;
+var totalRowsCleared = 0;
+var rowsCleared = 0;
+
+function newRound() {
+    allowDown = true;
+    setDifficulty();
+    newGamePiece();
+    setFuturePiece();
+    addToQueue(1);
+}
+
+function newGamePiece() {
+    gamePiece.xPosition = canvas.width / 2;
+    gamePiece.yPosition = - 3 * baseUnitSize;
+    gamePiece.orientation = futurePiece.orientation;
+    gamePiece.type = futurePiece.type;
+    gamePiece.color = futurePiece.color;
+    gamePiece.updateTemplate();
+    gamePlayRounds++;
+}
 
 function addToQueue(numberOfPieces) {
     let piece = {};
@@ -627,15 +650,11 @@ function setFuturePiece() {
     futurePieces.shift();
 }
 
-var fallSpeed = 1; // base units per second
-
 function gravity() {
     if (gamePiece.yPosition < canvas.height) {
         gamePiece.yPosition += fallSpeed * baseUnitSize / (1000 / FPS);
     }
 }
-
-var fallspeedReference = 1;
 
 function fallSpeedListener() {
     if(fallSpeed == (fallspeedReference + 1)) {
@@ -643,8 +662,6 @@ function fallSpeedListener() {
         fallspeedReference++;
     }
 }
-
-var gamePlayRounds = 0;
 
 function setDifficulty() {
     if (gamePlayRounds % 15 == 0 && gamePlayRounds > 0) {
@@ -660,6 +677,20 @@ function setDifficulty() {
     }
     fallSpeed = Math.floor(playerScore / 100) + 1;
     fallSpeedListener();
+}
+
+function givePoints(rowsCleared) {
+    if (rowsCleared == 1) {
+        playerScore += 10;
+    }
+    else if (rowsCleared > 1 && rowsCleared < 4) {
+        playerScore += 20 * rowsCleared;
+        rowComboToken = 0;
+    }
+    else if (rowsCleared > 3) {
+        playerScore += 20 * rowsCleared;
+        comboKingToken = 0;
+    }
 }
 
 function createChallengeRow(numberOfRows) {
@@ -680,75 +711,6 @@ function createChallengeRow(numberOfRows) {
             }
         }
     }
-}
-
-function drawGamePiece() {
-    for (let i = 0; i < 4; i++) {
-        context.beginPath();
-        context.fillStyle = colors[gamePiece.color];
-        context.lineWidth = baseUnitSize / 10;
-        context.strokeStyle = "black";
-        context.rect(gamePiece.template[i][0], gamePiece.template[i][1], baseUnitSize, baseUnitSize);
-        context.fill();
-        context.stroke();
-    }
-}
-
-function drawShadowPiece() {
-    gamePieceShadow();
-    for (let i = 0; i < 4; i++) {
-        context.beginPath();
-        context.lineWidth = baseUnitSize / 10;
-        context.strokeStyle = "#666";
-        context.rect(shadowPiece.template[i][0] + baseUnitSize / 10, shadowPiece.template[i][1] + baseUnitSize / 10, baseUnitSize - baseUnitSize / 5, baseUnitSize - baseUnitSize / 5);
-        context.stroke();
-    }
-}
-
-function drawNextPiece() {
-    if (gameState == 0) {
-        futurePiece.yPosition = (3 * baseUnitSize) - (sideBarSlideUpToken / 8.5 * baseUnitSize * 70 / (sideBarSlideUpToken + 10));
-        futurePiece.updateTemplate();
-    }
-    for (let i = 0; i < 4; i++) {
-        sideContext.beginPath();
-        sideContext.fillStyle = colors[futurePiece.color];
-        sideContext.lineWidth = baseUnitSize / 10;
-        sideContext.strokeStyle = "black";
-        sideContext.rect(futurePiece.template[i][0], futurePiece.template[i][1], baseUnitSize, baseUnitSize);
-        sideContext.fill();
-        sideContext.stroke();
-    }
-}
-
-function drawFallenPieces() {
-    for (let i = 0; i < fallenPieces.length; i++) {
-        context.beginPath();
-        context.fillStyle = colors[fallenPieces[i][2]];
-        context.lineWidth = baseUnitSize / 10;
-        context.strokeStyle = "black";
-        context.rect(fallenPieces[i][0], fallenPieces[i][1], baseUnitSize, baseUnitSize);
-        context.fill();
-        context.stroke();
-    }
-}
-
-function newRound() {
-    allowDown = true;
-    setDifficulty();
-    newGamePiece();
-    setFuturePiece();
-    addToQueue(1);
-}
-
-function newGamePiece() {
-    gamePiece.xPosition = canvas.width / 2;
-    gamePiece.yPosition = - 3 * baseUnitSize;
-    gamePiece.orientation = futurePiece.orientation;
-    gamePiece.type = futurePiece.type;
-    gamePiece.color = futurePiece.color;
-    gamePiece.updateTemplate();
-    gamePlayRounds++;
 }
 
 function gamePieceShadow() {
@@ -781,8 +743,6 @@ function liftShadow() {
     }
 }
                 
-
-// Collision detection helper function, prevents fallthroughs
 function willCollide() {
     for (let i = 0; i < 4; i++) {
         if (gamePiece.template[i][1] + 2 * baseUnitSize >= canvas.height) {
@@ -807,10 +767,6 @@ function willCollide() {
     allowDown = true;
 }
 
-// Collision detection
-// Consider hitboxes of playable tetromino subsquares as bottom left corner points
-// Consider hitboxes of fallen tetromino subsquares as top left corner points
-// Compare for match, this function has trouble at high speed without willCollide();
 function detectCollision() {
     willCollide();
     for (let i = 0; i < 4; i++) {
@@ -868,41 +824,30 @@ function detectLateralCollisionRight() {
     return false;
 }
 
-function allowRotation(tryingToRotateTo) {
-    let rotationCheckPiece = {};
-    rotationCheckPiece.xPosition = gamePiece.xPosition;
-    rotationCheckPiece.yPosition = gamePiece.yPosition;
-    selectGamePiece(rotationCheckPiece, tryingToRotateTo, gamePiece.type);
-    for (let i = 0; i < 4; i++) {
-        if (rotationCheckPiece.template[i][1] > canvas.height) {
-            return false;
-        }
-        for (let j = 0; j < fallenPieces.length; j++) {
-            if (rotationCheckPiece.template[i][0] == fallenPieces[j][0] &&
-                rotationCheckPiece.template[i][1] >= fallenPieces[j][1] &&
-                rotationCheckPiece.template[i][1] <= fallenPieces[j][1] + baseUnitSize) {
-                return false;
+function checkLoss() {
+    for (i = 0; i < 4; i++) {
+        if (gamePiece.template[i][1] <= 0) {
+            dangerWarningToken = 0;
+            gameState = -99;
+            if (serverStatus.status == "Online") {
+                getLeaderboard();
             }
+            animateBlocksUp();
+            return;
         }
     }
-    return true;
 }
-
-// Check for full rows by top left corner of block, recursively
-
-var totalRowsCleared = 0;
-var rowsCleared = 0;
 
 function detectCompleteRows() {
     snapToGrid();
     let totalPossible = canvas.width / baseUnitSize;
     let totalBlockCount = 0;
-    for (let i = 0; i < canvas.height; i += baseUnitSize) { // start at the top and go down row by row
-        totalBlockCount = 0; // reset block count before moving to next row
-        for (let j = 0; j < canvas.width; j += baseUnitSize) { // check each row from left to right
-            for (let k = 0; k < fallenPieces.length; k++) { // look at each fallen block
+    for (let i = 0; i < canvas.height; i += baseUnitSize) {
+        totalBlockCount = 0;
+        for (let j = 0; j < canvas.width; j += baseUnitSize) {
+            for (let k = 0; k < fallenPieces.length; k++) {
                 if (fallenPieces[k][1] == i && 
-                    fallenPieces[k][0] == j) { // count how many blocks are in the row
+                    fallenPieces[k][0] == j) {
                         totalBlockCount ++;
                 }
             }
@@ -938,7 +883,6 @@ function shiftRowsDown(row) {
     }
 }
 
-// Set alignment on tetromino before saving as fallen
 function alignGamePiece(currentPosition, referencePosition) {
     for (let i = 0; i < 4; i++) {
         gamePiece.template[i][1] -= (currentPosition - referencePosition);
@@ -946,7 +890,6 @@ function alignGamePiece(currentPosition, referencePosition) {
     snapToGrid();
 }
 
-// Straighten all blocks, scoring relies on this
 function snapToGrid() {
     for (let i = 0; i < fallenPieces.length; i++) {
         for (let j = 0; j < 2; j++) {
@@ -963,8 +906,6 @@ function snapToGrid() {
     }
 }
 
-var fallenPieces = [];
-
 function saveToFallen() {
     for (let i = 0; i < 4; i++) {
         gamePiece.template[i].push(gamePiece.color);
@@ -973,6 +914,28 @@ function saveToFallen() {
             dangerWarningToken = 40;
         }
     }
+}
+
+// Piece movement
+//------------------------------------------------------------------------------
+function allowRotation(tryingToRotateTo) {
+    let rotationCheckPiece = {};
+    rotationCheckPiece.xPosition = gamePiece.xPosition;
+    rotationCheckPiece.yPosition = gamePiece.yPosition;
+    selectGamePiece(rotationCheckPiece, tryingToRotateTo, gamePiece.type);
+    for (let i = 0; i < 4; i++) {
+        if (rotationCheckPiece.template[i][1] > canvas.height) {
+            return false;
+        }
+        for (let j = 0; j < fallenPieces.length; j++) {
+            if (rotationCheckPiece.template[i][0] == fallenPieces[j][0] &&
+                rotationCheckPiece.template[i][1] >= fallenPieces[j][1] &&
+                rotationCheckPiece.template[i][1] <= fallenPieces[j][1] + baseUnitSize) {
+                return false;
+            }
+        }
+    }
+    return true;
 }
 
 function rotateGamePiece(direction) {
@@ -1039,6 +1002,21 @@ function moveGamePiece(direction) {
 
 // Leaderboard
 //------------------------------------------------------------------------------
+var serverStatus = {status: "Unknown", color: "darkgrey"};
+
+function checkForMods() {
+    if (
+        width == 10 &&
+        height == 20 &&
+        FPS == 30 &&
+        fallSpeed == (Math.floor(playerScore / 100) + 1)
+    ) {
+        return false;
+    }
+    else {
+        return true;
+    }
+}
 
 function getLeaderboard() {
     let xhr = new XMLHttpRequest();
@@ -1047,7 +1025,8 @@ function getLeaderboard() {
     xhr.responseType = 'text';
     xhr.onload = function () {
         if (xhr.readyState === xhr.DONE && 
-            xhr.status === 200) {
+            xhr.status === 200 &&
+            checkForMods() == false) {
                 leaderboard = JSON.parse(xhr.response).leaderboard;
                 console.log(leaderboard);
                 return;
@@ -1064,7 +1043,6 @@ function submitScore() {
     xhr.send(JSON.stringify({name: playerName, score: playerScore}));
 }
 
-var serverStatus = {status: "Unknown", color: "darkgrey"};
 
 function checkServerStatus() {
     let xhr = new XMLHttpRequest();
@@ -1083,7 +1061,6 @@ function checkServerStatus() {
     }
     xhr.send();
 }
-
 
 function checkNewHighScore() {
     if (leaderboard != 0) {
@@ -1112,7 +1089,6 @@ function buildLeaderboard() {
 
 // Keyboard event listeners and friends
 //------------------------------------------------------------------------------
-
 document.addEventListener("keydown", keyDownHandler, false);
 document.addEventListener("touchstart", touchStart, {passive: false});
 document.addEventListener("touchmove", touchMove, {passive: false});
@@ -1200,66 +1176,11 @@ function keyDownHandler(event) {
             rotateGamePiece("CLOCKWISE");
         }
     }
-    if (DEBUG == true) {
-        // Game piece chooser
-        if (event.keyCode == 73) {
-            // I key
-            gamePiece.type = "I";
-        }
-        else if (event.keyCode == 79) {
-            // O key
-            gamePiece.type = "O";
-        }
-        else if (event.keyCode == 84) {
-            // T key
-            gamePiece.type = "T";
-        }
-        else if (event.keyCode == 83) {
-            // S key
-            gamePiece.type = "S";
-        }
-        else if (event.keyCode == 90) {
-            // Z key
-            gamePiece.type = "Z";
-        }
-        else if (event.keyCode == 74) {
-            // J key
-            gamePiece.type = "J";
-        }
-        else if (event.keyCode == 76) {
-            // L key
-            gamePiece.type = "L";
-        }
-        else if (event.keyCode == 16) {
-            // Right Shift key
-            let i = prompt("Enter a theme number...")
-            colors = themes[i - 1];
-            activeTheme = i;
-        }
-        // RDFG movement pad without boundary checks
-        else if (event.keyCode == 68) {
-            // D key
-            gamePiece.xPosition -= baseUnitSize;
-        }
-        else if (event.keyCode == 71) {
-            // G key
-            gamePiece.xPosition += baseUnitSize;
-        }
-        else if (event.keyCode == 82) {
-            // R key
-            gamePiece.yPosition -= baseUnitSize;
-        }
-        else if (event.keyCode == 70) {
-            // F key
-            gamePiece.yPosition += baseUnitSize;
-        }
-    }
 }
 
 
 // Selectors for retreiving piece template formulas and boundaries
-//-------------------------------------------------------------------------
-
+//------------------------------------------------------------------------------
 function selectGamePiece(target, orientation, type) {
     switch(type) {
         case "I":

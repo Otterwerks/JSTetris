@@ -8,7 +8,7 @@ _My own version of the classic puzzle game Tetris._
 
 ## Summary
 
-I decided to do a remake of a classic arcade game as an introduction to Javascript. I chose to make Tetris because it was always my favorite game as a kid and playing it brings back a great sense of nostalgia. The objective of the game is to maneuver the falling pieces to create full rows of blocks with no gaps at the bottom of the screen. The game ends when the fallen blocks reach the top of the screen.
+I decided to do a remake of a classic arcade game as an introduction to JavaScript. I chose to make Tetris because it was always my favorite game as a kid and playing it brings back a great sense of nostalgia. The objective of the game is to maneuver the falling pieces to create full rows of blocks with no gaps at the bottom of the screen. The game ends when the fallen blocks reach the top of the screen.
 
 <br>
 
@@ -52,20 +52,14 @@ I devloped this game with the help of the following resources:
 <br>
 
 ## Modifications
-The following sections are guidelines for changing parameters that will alter gameplay.
+The following sections are guidelines for changing parameters that will alter gameplay. The leaderboard function will be unavailable if the game speed or size are modified. If you perform further modifications, please disable the leaderboard by commenting out line 1030 `leaderboard = JSON.parse(xhr.response).leaderboard;`.
 
 #### Game Board Size
-_coming soon_
+The size of the game board grid can be changed on lines 14 and 15 of game.js: `width = 10` and `height = 20` are the default values, where the units are in grid blocks.
 
-#### Difficulty
-_coming soon_
-
-#### Piece Probability
-_coming soon_
-
-#### Scoring
-_coming soon_
+#### Game Speed
+The game speed can be altered on line 10: `FPS = 30` is the default value. A higher number will result in faster game speed, in frames per second.
 
 #### Color Themes
-_coming soon_
+Add your own color theme by using the following format and inserting the array after line 122: `["#AAAAAA", "#BBBBBB", "#CCCCCC", "#DDDDDD", "#EEEEEE"],`, colors should be set as 6 digit hex values to work properly with animations. Color arrays must have a minimum length of 3 colors and have no maximum length.
 

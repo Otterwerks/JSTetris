@@ -4,6 +4,10 @@ _My own version of the classic puzzle game Tetris._
 
 <br>
 
+Try it out [here](https://otterwerks.github.io/JSTetris) on GitHub Pages.
+
+<br>
+
 <img src="20190213_111052.jpg" width="400">
 
 ## Summary

@@ -4,7 +4,7 @@ _My own version of the classic puzzle game Tetris._
 
 <br>
 
-Try it out [here](https://otterwerks.github.io/JSTetris) on GitHub Pages.
+Try it out [here](https://otterwerks.github.io/JSTetris) on GitHub Pages. Mobile Friendly!
 
 <br>
 
@@ -45,16 +45,6 @@ The game can be statically hosted and remains playable independently from the se
 
 <br>
 
-## Resources Used
-I devloped this game with the help of the following resources:
-- Creating a Pong Game ([link](https://www.udemy.com/code-your-first-game/))
-- Creating a Breakout Game ([link](https://developer.mozilla.org/en-US/docs/Games/Tutorials/2D_Breakout_game_pure_JavaScript))
-- Using HTML Canvas to Create a Game ([link](https://medium.freecodecamp.org/how-creating-simple-canvas-games-helped-me-6eef839f450e))
-- Set Up a Node.JS Server To Add a Leaderboard To Your Game ([link](http://clockworkchilli.com/blog/7_set_up_a_node.js_server_to_add_a_leaderboard_to_your_game))
-- [Stackoverflow](https://www.stackoverflow.com) for occasional troubleshooting
-
-<br>
-
 ## Modifications
 The following sections are guidelines for changing parameters that will alter gameplay. The leaderboard function will be unavailable if the game speed or size are modified. If you perform further modifications, please disable the leaderboard by commenting out line 1030 `leaderboard = JSON.parse(xhr.response).leaderboard;`.
 
@@ -66,4 +56,14 @@ The game speed can be altered on line 10: `FPS = 30` is the default value. A hig
 
 #### Color Themes
 Add your own color theme by using the following format and inserting the array after line 122: `["#AAAAAA", "#BBBBBB", "#CCCCCC", "#DDDDDD", "#EEEEEE"],`, colors should be set as 6 digit hex values to work properly with animations. Color arrays must have a minimum length of 3 colors and have no maximum length.
+
+<br>
+
+## Resources Used
+I devloped this game with the help of the following resources:
+- Creating a Pong Game ([link](https://www.udemy.com/code-your-first-game/))
+- Creating a Breakout Game ([link](https://developer.mozilla.org/en-US/docs/Games/Tutorials/2D_Breakout_game_pure_JavaScript))
+- Using HTML Canvas to Create a Game ([link](https://medium.freecodecamp.org/how-creating-simple-canvas-games-helped-me-6eef839f450e))
+- Set Up a Node.JS Server To Add a Leaderboard To Your Game ([link](http://clockworkchilli.com/blog/7_set_up_a_node.js_server_to_add_a_leaderboard_to_your_game))
+- [Stackoverflow](https://www.stackoverflow.com) for occasional troubleshooting
 

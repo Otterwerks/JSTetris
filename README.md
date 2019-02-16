@@ -46,6 +46,7 @@ I devloped this game with the help of the following resources:
 - Creating a Pong Game ([link](https://www.udemy.com/code-your-first-game/))
 - Creating a Breakout Game ([link](https://developer.mozilla.org/en-US/docs/Games/Tutorials/2D_Breakout_game_pure_JavaScript))
 - Using HTML Canvas to Create a Game ([link](https://medium.freecodecamp.org/how-creating-simple-canvas-games-helped-me-6eef839f450e))
+- Set Up a Node.JS Server To Add a Leaderboard To Your Game ([link](http://clockworkchilli.com/blog/7_set_up_a_node.js_server_to_add_a_leaderboard_to_your_game))
 - [Stackoverflow](https://www.stackoverflow.com) for occasional troubleshooting
 
 <br>

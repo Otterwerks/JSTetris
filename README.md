@@ -12,7 +12,7 @@ Try it out [here](https://otterwerks.github.io/JSTetris) on GitHub Pages. Mobile
 
 ## Summary
 
-I decided to do a remake of a classic arcade game as an introduction to JavaScript. I chose to make Tetris because it was always my favorite game as a kid and playing it brings back a great sense of nostalgia. The objective of the game is to maneuver the falling pieces to create full rows of blocks with no gaps at the bottom of the screen. The game ends when the fallen blocks reach the top of the screen.
+I decided to do a remake of a classic arcade game as an introduction to JavaScript. I chose to make Tetris because it was always my favorite game as a kid and playing it brings back a great sense of nostalgia. The objective of the game is to maneuver the falling pieces to create full rows of blocks with no gaps when they land at the bottom of the screen. The game ends when the fallen blocks reach the top of the screen.
 
 <br>
 

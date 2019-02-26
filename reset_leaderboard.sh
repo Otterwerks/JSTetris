@@ -1,3 +1,4 @@
+#!/bin/bash
 # This script clears the leaderboard and replaces it with default values
 mongo JSTetris_server
 db.scores.drop()

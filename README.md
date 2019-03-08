@@ -20,7 +20,7 @@ I decided to do a remake of a classic arcade game as an introduction to JavaScri
 - Responsive, touch friendly
 - Progressive difficulty through fall speed and additional bottom row blocks
 - Points are assigned at 10 points for a single row, 20 points per row if multiple rows are cleared at once
-- High scores loaded from and saved to a leaderboard server
+- High scores loaded from and saved to a remote leaderboard server
 - Shadow outline of where the game piece will land
 
 <br>

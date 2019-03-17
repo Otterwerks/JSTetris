@@ -8,6 +8,10 @@ Try it out [here](https://otterwerks.github.io/JSTetris) on GitHub Pages. Mobile
 
 <br>
 
+<p><img src="icons/javascript.svg" width="50">&nbsp&nbsp&nbsp&nbsp<img src="icons/css-3.svg" width="40">&nbsp&nbsp&nbsp&nbsp<img src="icons/html-5.svg" width="40">&nbsp&nbsp&nbsp&nbsp<img src="icons/nodejs.svg" width="100">&nbsp&nbsp&nbsp&nbsp<img src="icons/express.svg" width="150">&nbsp&nbsp&nbsp&nbsp<img src="icons/mongodb.svg" width="200">&nbsp&nbsp&nbsp&nbsp<img src="icons/raspberry-pi.svg" width="40">&nbsp&nbsp&nbsp&nbsp</p>
+
+<br>
+
 <img src="20190213_111052.jpg" width="400">
 
 ## Summary
@@ -37,6 +41,7 @@ The game can be statically hosted and remains playable independently from the se
 #### Server
 - Node JS
 - Mongo DB
+- Hosted on a Raspberry Pi Zero W
 
 #### Server Dependencies
 - Express JS (`npm install express`)

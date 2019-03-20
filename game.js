@@ -332,7 +332,7 @@ function drawInstructions() {
     context.font = baseUnitSize / 2 + "px Monaco, monospace";
     context.fillText("GAME STARTING IN:", canvas.width / 2, baseUnitSize * 15);
     context.font = baseUnitSize + "px Monaco, monospace";
-    context.fillText(Math.ceil((300 - splashToken) / FPS), canvas.width / 2, baseUnitSize * 17);
+    context.fillText(Math.ceil((600 - splashToken) / FPS), canvas.width / 2, baseUnitSize * 17);
     context.font = baseUnitSize / 2 + "px Monaco, monospace";
     context.fillText("TAP OR CLICK", canvas.width / 2, baseUnitSize * 18);
     context.fillText("TO SKIP", canvas.width / 2, baseUnitSize * 19);

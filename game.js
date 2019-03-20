@@ -336,7 +336,7 @@ function drawInstructions() {
     context.font = baseUnitSize / 2 + "px Monaco, monospace";
     context.fillText("TAP OR CLICK", canvas.width / 2, baseUnitSize * 18);
     context.fillText("TO SKIP", canvas.width / 2, baseUnitSize * 19);
-    if (splashToken == 300) {
+    if (splashToken == 600) {
         canvas.style.backgroundColor = "#EEE";
         sideCanvas.style.backgroundColor = "#FFFFFFAA";
         gameState = -3;

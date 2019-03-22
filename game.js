@@ -1093,7 +1093,7 @@ document.addEventListener("keydown", keyDownHandler, false);
 document.addEventListener("touchstart", touchStart, {passive: false});
 document.addEventListener("touchmove", touchMove, {passive: false});
 document.addEventListener("touchend", touchEnd, {passive: false});
-main.addEventListener("click", function() {splashToken = 300;});
+main.addEventListener("click", function() {splashToken = 600;});
 
 var touchStartX = 0;
 var touchStartY = 0;
@@ -1103,7 +1103,7 @@ function touchStart(event) {
     touchStartX = event.touches[0].pageX;
     touchStartY = event.touches[0].pageY;
     if (gameState == -2) {
-        splashToken = 300;
+        splashToken = 600;
     }
 }
 

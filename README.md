@@ -30,7 +30,7 @@ I decided to do a remake of a classic arcade game as an introduction to JavaScri
 <br>
 
 ## Technical
-The game can be statically hosted and remains playable independently from the server. The game server will require the dependencies listed below as well as an SSL certificate if the game is loaded from an HTTPS address.
+The game can be statically hosted and remains playable independently from the server. The game server will require the dependencies listed below as well as an SSL certificate if the game is loaded from an HTTPS address. I have provided two shell scripts that I wrote to restart the database and clear the database, these should be edited with the appropriate paths for your environment.
 **Browsers supporting 8 digit hex colors are required for some animations to display properly, gameplay is not impacted.**
 
 #### Game

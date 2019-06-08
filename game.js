@@ -187,12 +187,22 @@ window.onload = function() {
             drawTetros();
         }
         else if (gameState == -3) { // Initialize Game
+            playerScore = 0;
+            rightSlidePanelToken = -1;
+            sideBarSlideUpToken = 0;
+            sideBarSlideRightToken = 0;
+            fallenPieces = [];
+            gamePlayRounds = 0;
+            fallSpeed = 1;
+            totalRowsCleared = 0;
             gamePiece.xPosition = canvas.width / 2;
             gamePiece.yPosition = - 3 * baseUnitSize;
             gamePiece.orientation = Math.floor((Math.random() * 4) + 1);
             gamePiece.type = TETROMINOS[Math.floor(Math.random() * TETROMINOS.length)];
             gamePiece.color = Math.floor(Math.random() * colors.length);
             gamePiece.updateTemplate();
+            futurePiece.yPosition = baseUnitSize + (baseUnitSize * 2);
+            futurePiece.updateTemplate();
             if (fadeToBlackToken < 15) {
                 fadeToBlack();
             }
@@ -555,7 +565,7 @@ function drawGameOver() {
     context.font = baseUnitSize + "px Monaco, monospace";
     context.fillText("GAME OVER", canvas.width - ((canvas.width * 30) / gameOverSlideInToken), baseUnitSize * 6);
     context.font = (baseUnitSize / 2) + "px Monaco, monospace";
-    context.fillText("Reload page to play again", ((canvas.width * 30) / gameOverSlideInToken), baseUnitSize * 7);
+    context.fillText("Click or Tap to play again", ((canvas.width * 30) / gameOverSlideInToken), baseUnitSize * 7);
     if (gameOverSlideInToken < 60) {
         gameOverSlideInToken++;
     }
@@ -1093,7 +1103,7 @@ document.addEventListener("keydown", keyDownHandler, false);
 document.addEventListener("touchstart", touchStart, {passive: false});
 document.addEventListener("touchmove", touchMove, {passive: false});
 document.addEventListener("touchend", touchEnd, {passive: false});
-main.addEventListener("click", function() {splashToken = 600;});
+main.addEventListener("click", function() {if (gameState == -2) {splashToken = 600;} else if (gameState == 0) {gameState = -3;}});
 
 var touchStartX = 0;
 var touchStartY = 0;
@@ -1104,6 +1114,8 @@ function touchStart(event) {
     touchStartY = event.touches[0].pageY;
     if (gameState == -2) {
         splashToken = 600;
+    } else if (gameState == 0) {
+        gameState = -3;
     }
 }
 

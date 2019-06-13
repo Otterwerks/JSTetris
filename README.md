@@ -65,7 +65,7 @@ Add your own color theme by using the following format and inserting the array a
 <br>
 
 ## Resources Used
-I devloped this game with the help of the following resources:
+I developed this game with the help of the following resources:
 - Creating a Pong Game ([link](https://www.udemy.com/code-your-first-game/))
 - Creating a Breakout Game ([link](https://developer.mozilla.org/en-US/docs/Games/Tutorials/2D_Breakout_game_pure_JavaScript))
 - Using HTML Canvas to Create a Game ([link](https://medium.freecodecamp.org/how-creating-simple-canvas-games-helped-me-6eef839f450e))
